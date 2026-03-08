@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>桐生憲法予想エディタ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: sans-serif; font-size: 14px; }
+        .input-field { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px; width: 100%; color: white; }
+        .section-title { font-weight: bold; color: #38bdf8; margin-top: 12px; margin-bottom: 4px; display: block; border-left: 4px solid #38bdf8; padding-left: 8px; }
+        .tilt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    </style>
+</head>
+<body class="p-4 pb-24">
+    <h1 class="text-lg font-bold text-center mb-4 text-white border-b border-sky-500 pb-2">桐生 憲法予想入力</h1>
+
+    <label class="section-title">基本情報</label>
+    <div class="grid grid-cols-2 gap-2"><input type="date" id="date" class="input-field"><select id="dayCount" class="input-field"><option>初日</option><option>2日目</option><option>3日目</option><option>4日目</option><option>5日目</option><option>最終日</option></select></div>
+    <div class="grid grid-cols-2 gap-2 mt-2"><select id="plate" class="input-field"><option value="無し">安定板：無し</option><option value="有り">安定板：有り</option></select><select id="laps" class="input-field"><option value="3周戦">3周戦</option><option value="2周戦">2周戦</option></select></div>
+
+    <label class="section-title">気象</label>
+    <div class="grid grid-cols-2 gap-2"><select id="weather" class="input-field"><option>晴れ</option><option>曇り</option><option>雨</option><option>雪</option></select><select id="windDir" class="input-field"><option>追い風</option><option>向かい風</option><option>横風</option></select></div>
+    <div class="grid grid-cols-2 gap-2 mt-2"><input type="number" id="windSpeed" placeholder="風速(m)" class="input-field"><input type="number" id="wave" placeholder="波高(cm)" class="input-field"></div>
+
+    <label class="section-title">進入・チルト</label>
+    <input type="text" id="formation" placeholder="進入例：123 / 456" class="input-field mb-2">
+    <div class="tilt-grid">
+        <div class="text-xs">1号艇<select id="t1" class="input-field"><option>-0.5</option><option>0</option><option>0.5</option><option>1</option></select></div>
+        <div class="text-xs">2号艇<select id="t2" class="input-field"><option>-0.5</option><option>0</option><option>0.5</option><option>1</option></select></div>
+        <div class="text-xs">3号艇<select id="t3" class="input-field"><option>-0.5</option><option>0</option><option>0.5</option><option>1</option></select></div>
+        <div class="text-xs">4号艇<select id="t4" class="input-field"><option>-0.5</option><option>0</option><option>0.5</option><option>1</option></select></div>
+        <div class="text-xs">5号艇<select id="t5" class="input-field"><option>-0.5</option><option>0</option><option>0.5</option><option>1</option></select></div>
+        <div class="text-xs">6号艇<select id="t6" class="input-field"><option>-0.5</option><option>0</option><option>0.5</option><option>1</option></select></div>
+    </div>
+
+    <label class="section-title">部品交換・備考</label>
+    <textarea id="parts" placeholder="部品交換など（例：3号艇ピストン交換）" class="input-field h-16"></textarea>
+
+    <label class="section-title">添付画像</label>
+    <input type="file" id="images" multiple accept="image/*" class="text-xs text-slate-400">
+
+    <div class="fixed bottom-0 left-0 w-full p-4 bg-slate-900 border-t border-slate-700">
+        <button onclick="generatePrompt()" class="w-full bg-sky-600 text-white font-bold py-3 rounded-lg active:scale-95 transition-all">
+            憲法プロンプトを生成・コピー
+        </button>
+    </div>
+
+    <script>
+        function generatePrompt() {
+            const getV = (id) => document.getElementById(id).value;
+            
+            // --- 【重要】ここにあなたの憲法を貼り付けてください ---
+            const myConstitution = `
+
+# ボートレース桐生・予想執行憲法
+
+このプロンプトは、これまでの全ての学習内容と修正ルールを統合した「舟券推理の至上命令」である。新しいチャットにおいても、以下の全7条および特殊ルールを最優先し、例外なき分析を行うこと。
+
+### 第1条：分析の至上命題
+1. **的中最優先**: 期待値より的中率を重視。自信順に本線を構築し、無謀な穴狙いは避ける。
+2. **正確な読解**: 送信画像（出走表・展示タイム・スリット）の数字は一文字ずつ正確に読み取り、推測や混同は厳禁。不明瞭な場合は必ずユーザーに再提示を求める。
+3. **情報の独立性**: 未提示の「レース結果」「配当」等を外部取得せず、提供された画像とデータのみで推理する。
+4. **桐生特化**: 展示データ分析は「ボートレース桐生」開催分のみを対象とする。
+
+### 第2条：イン信頼度判定（ステップ1：1に不安はない？）
+1. **不安なし（Yes）の条件**:
+   - A1級かつ直線タイム1位。
+   - **格上インの原則**: A1級で今節好調なら、機力タイム劣勢でも「Yes」。
+   - **A1級ドリーム特約**: 優勝・準優勝・ドリームのA1インは逃げ率80%で見認める。
+   - 2号艇の逃がし率が60%以上（安定板時は70%超）の強力なカベがいる場合。
+2. **不安あり（No）の条件**:
+   - A級インでも「直線・周回タイムが共に下位」かつ「2号艇の逃がし率が低い」。
+   - B級イン × ST遅れ（平均・展示共に.25〜）。
+   - **安定板2周戦の厳格判定**: 展示で2が凹む（スリット崩壊）、または1の周回・回り足が下位なら即座に「No」。
+
+### 第3条：展開の優先順位（格 vs タイム）
+1. **直線1位の鉄則**: 直線タイム1位は3連対率70%。紐（2・3着）検討の軸とする。
+2. **格付け優先のブレーキ**: 外枠にタイム1位がいても、内（1・2）が共にA1級でST安定なら「捲りきれず沈む」リスクを高く見積もる。
+3. **2コースA1級の壁**: 2号艇がA1級なら、逃がし率に関わらず壁機能を優先し「1-2」を主軸にする。
+4. **特殊状況（内枠回帰）**: 優勝戦等で内に絶対的エース（A1）がおりスリットが揃うなら、機力より「内枠決着（1-2, 1-3）」を優先。
+
+### 第4条：展示評価・機力分析の優先順位
+1. **通常時（3周・安定板なし）**:
+   - 評価順：**半周タイム ＞ 直線タイム ≧ 回り足 ＞ 展示タイム**。
+   - 半周タイム1位を捲り差しの最優先根拠とする。
+2. **特殊時（2周戦・安定板あり）**:
+   - 評価順：**周回タイム（旋回・押し） ＞ 回り足 ＞ 直線（行き足）**。
+   - **伸び（展示タイム）は無視**。重い選手のハーフタイム1位は割り引く。
+   - 直線1位は3着軸に必須だが、1着固定は周回タイム上位勢を優先。
+3. **モーター・ボートの動的補正（ランキング提示時）**:
+   - **上位・エース機補正**: 2連率40%以上、またはランキング上位機は、展示タイムが平凡でも「実戦での押し・出足」を評価し、機力ランクを1段階引き上げる。
+   - **低調機・ワースト補正**: 2連率20%台、またはランキング下位機は、展示タイムが良くても「伸びだけの機体」または「乗り心地の不安」と判断し、連対評価を割り引く。
+   - **安定板時の優先度**: 安定板使用時は、タイム数値よりも「モーターの底力（押し）」が旋回戦で勝るため、ランキング上位勢の評価を最優先する。
+
+### 第5条：特定選手・道中裁きデータ
+1. **逆転能力（道中裁き）**: 毒島誠、白井英治、辻栄蔵、羽野直也、中島孝平、峰竜太、仲口博崇、山田康二。
+2. **コース別強者**:
+   - 3コース連対: 池田浩二、茅原悠紀、山田康二、藤山翔大、吉川昭男、奏英悟、中辻祟人、久保田敏之、北野輝季、秋元哲、三浦敬太。
+   - 5コース1着: 菊池孝平、毒島誠、宮地元輝、島村隆幸、池田浩二、長田頼宗。
+3. **女子・混合戦**: 守屋(1着率87%)、藤原(81%)、海野(80%)。捲り差し特化：遠藤エミ、浜田亜理沙、今井美亜。
+
+### 第6条：舟券推理フローチャート（絶対遵守）
+1. ステップ1：1に不安材料はない？
+• 【Yes（不安なし）】の場合
+• Q：1の逃げパターンは外側に張る？
+• Yes ➔ 【パターンA】：1-4、1-5
+• No ➔ Q：1は落としてまわる？
+• Yes ➔ 【パターンB】：1-3
+• No ➔ 【パターンC】：1-2
+• 【No（不安あり）】の場合
+• Q：攻め手はいる？
+• No ➔ （1を軸に再検討）
+• Yes ➔ Q：カベとなるレーサーはいる？
+• Yes ➔ Q：カベがあれば1は逃げられる？
+• Yes ➔ 【パターンD】：1 ➔ カベ、1 ➔ 攻め手
+• No ➔ 【パターンE】：カベ ➔ 攻め手、攻め手 ➔ カベ
+• No ➔ Q：カベがなくても1は2着に残せる？
+• Yes ➔ 【パターンF】：カベ ➔ 1、攻め手 ➔ 1、攻め手の外 ➔ 1
+• No ➔ 【パターンG】：攻め手 ➔ 攻め手の外、攻め手の外 ➔ 攻め手
+2. **連動の鉄則**: 3・4が攻める展開では、その**すぐ外側（攻め手の隣）**が最大恩恵。A級や回り足上位なら1・2着候補。
+
+### 第7条：黄金比（格 vs 物理数値）
+1. **イン逃げの結界**: イン格上(A級) × 2号艇逃がし率60%超（安定板時70%超）なら「1-2」本線固定。
+2. **周回タイムの真価**: 「周回タイム1位」×「格上A1級」は、スリット劣勢でも道中逆転を最重視。
+3. **B級インの再定義**: 直線1位でもB級インなら「1着率」ではなく「残しの足（2・3着）」として扱う。
+4. **共倒れスリットの警戒**: タイム1位でもSTが遅い（.30台等）B級インは信頼度を下げ、「カベ自身の差し」を評価。
+5. **体重戦略**: 60kg以上の重量級でも展示が良ければ「カベ」として評価。51kg前後の軽量級は必ず「紐穴」で拾う。
+6. **外枠Sランクの評価修正**: 安定板2周戦では、外から展開を作るのが困難なため、内枠にA級や地元勢が揃う場合は、機力Sランクでも沈むリスクを通常より高く見積もる。
+
+### 第8条：外部データ・スリットパターンの適用
+1. **スリット12パターン準拠**:
+  - 提示されたスリット画像が以下の「12パターンのどれに該当するか」を即座に特定し、それに基づき展開（絞り、差し、まくり差し）を導き出す。
+   - 1.内側先行 / 2.横一線 / 3.1・2先行 / 4.スロー先行 / 5.カベなし / 6.2・3遅れ / 7.中凹み / 8.3の先攻め / 9.中ぶくれ / 10.1遅れ / 11.外側先行 / 12.ダッシュ先行
+   - 例：パターン3（内2艇先行）なら「1-2」固定、パターン7（4カド突出）なら「4-56」への連動を重視。
+2. **モーター・ボートランキングの序列**:
+   - モーター2連率40%超、または上位ランク機は「タイム以上の粘り」があるものと見なす。
+   - 特に【安定板あり】の際は、低調機の伸び不足を「致命的」と判断し、上位機との差を通常より大きく見積もる。
+3. **データ優先度の最終合意**:
+   - **(1)提示画像(展示・スリット)** ＞ **(2)選手格付け(A1〜B2)** ＞ **(3)モーター・ボート数値**
+   - ただし、(3)が「超抜（エース機）」または「低調（ワースト）」の場合は、(2)の格付けを逆転させる根拠として採用する。
+
+
+---
+
+##1※添付した画像（出走表、級別、体重、今節成績、1号艇の逃げ率、2号艇の逃し率、コース別成績など）。
+
+【参考情報（これらを疑うところから分析をスタートしてください）】
+-1. 画像から各艇の級別、体重、モーター2連対率、今節成績、枠別成績を正確に把握してください。
+-2. 共有済みの「舟券推理の基本フローチャート（1に不安はない？等のYes/No）」に沿って、客観的な事前展開予想をお願いします。
+
+##2※添付した画像（スタート展示・気象情報・オリジナル展示タイム・チルト角度）。
+※進入隊形、チルト角度、部品交換（あれば）もちゃんと把握して参考にすること。
+
+-1. 展示データの数値（半周タイム、周回、直線、回り足、展示タイム）を正確に復唱し、「直線タイム1位は3連対率70%」を考慮してください。
+-2. スタート展示画像を「共有済みのスリット隊形12パターン」に照らし合わせ、どのパターンに該当するかを特定した上で、行き足・伸びの気配と物理的な優劣を詳細に分析してください。
+-3. 「モーターランキング」「枠別成績」「スリット隊形からの気配（シミュレーション内容）」「舟券推理の基本フローチャート」を主軸とし、機力のS〜Bランク付けを行って最終的な買い目を出してください。
+-4. 買い目は5点以内で、自信のある順に並べてください。
+
+【◎本線】
+【○抑え】
+【▲穴】（展開がなければ不要）
+【★究極の1点】（本当にある時だけ）
+【✕見送り推奨】（勝算が全く読めない、展開予想が困難など、買い目は出すが見送った方が良い場合）
+
+各予想に自信度がつけられれば、A〜Cで示す。（必ずしもではない。）
+Aより高く自信があれば信頼度Sで示す。
+
+            `;
+            // --- ここまで ---
+
+            const prompt = `【ボートレース桐生 予想依頼】
+先に共有したモーターランキングと、以下の詳細データ、および私の「憲法」に基づき分析してください。
+
+■レースコンディション
+・日時: ${getV('date')} (${getV('dayCount')})
+・水面: 安定板${getV('plate')}、${getV('laps')}
+・気象: ${getV('weather')}、${getV('windDir')} ${getV('windSpeed')}m、波高${getV('wave')}cm
+・進入隊形: ${getV('formation')}
+・チルト: 1号艇(${getV('t1')}), 2号艇(${getV('t2')}), 3号艇(${getV('t3')}), 4号艇(${getV('t4')}), 5号艇(${getV('t5')}), 6号艇(${getV('t6')})
+・部品交換: ${getV('parts') || '特になし'}
+
+■私の憲法（最優先遵守事項）
+${myConstitution}
+
+添付画像の出走表、展示タイム、スリット気配を正確に読み取り、自信のある買い目を提示してください。`;
+
+            navigator.clipboard.writeText(prompt).then(() => {
+                alert("プロンプトをコピーしました！Geminiに画像を添えて貼り付けてください。");
+            });
+        }
+    </script>
+</body>
+</html>
