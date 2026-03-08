@@ -3,44 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新・桐生憲法予想入力</title>
+    <title>桐生憲法・完全版エディタ</title>
     <style>
-        body { font-family: sans-serif; background-color: #121212; color: #e0e0e0; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; }
+        body { font-family: sans-serif; background-color: #121212; color: #e0e0e0; padding: 15px; font-size: 14px; }
+        .container { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #4dabf7; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         label { display: block; margin-top: 15px; font-weight: bold; color: #4dabf7; }
-        select, input { width: 100%; padding: 10px; margin-top: 5px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
-        .tilt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
-        button { width: 100%; padding: 15px; margin-top: 25px; background: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
-        button:active { background: #0056b3; }
+        select, input[type="text"] { width: 100%; padding: 12px; margin-top: 5px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        
+        /* 部品交換エリア */
+        .parts-container { margin-top: 10px; background: #252525; padding: 10px; border-radius: 5px; border-left: 3px solid #007bff; }
+        .parts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 12px; margin-top: 5px; }
+        .part-item { display: flex; align-items: center; }
+        .part-item input { margin-right: 5px; transform: scale(1.2); }
+
+        button { width: 100%; padding: 18px; margin-top: 30px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:active { background: #0056b3; transform: scale(0.98); }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>桐生 憲法予想入力</h2>
     
-    <label>1. 月・レース</label>
-    <div class="tilt-grid">
+    <label>1. 月・レース・進行</label>
+    <div class="grid-2">
         <select id="month">
-            <option value="1月">1月</option><option value="2月">2月</option><option value="3月">3月</option>
-            <option value="4月">4月</option><option value="5月">5月</option><option value="6月">6月</option>
-            <option value="7月">7月</option><option value="8月">8月</option><option value="9月">9月</option>
-            <option value="10月">10月</option><option value="11月">11月</option><option value="12月">12月</option>
+            <script>for(let i=1;i<=12;i++) document.write(`<option value="${i}月">${i}月</option>`)</script>
         </select>
         <select id="raceNum">
             <script>for(let i=1;i<=12;i++) document.write(`<option value="${i}R">${i}R</option>`)</script>
         </select>
     </div>
-
-    <label>2. 節の進行</label>
-    <select id="dayType">
-        <option value="初日">初日</option><option value="2日目">2日目</option>
-        <option value="3日目">3日目</option><option value="4日目">4日目</option>
-        <option value="5日目">5日目</option><option value="6日目">6日目</option>
+    <select id="dayType" style="margin-top:10px;">
+        <option value="初日">初日</option><option value="2日目">2日目</option><option value="3日目">3日目</option>
+        <option value="4日目">4日目</option><option value="5日目">5日目</option><option value="6日目">6日目</option>
         <option value="最終日">最終日</option>
     </select>
 
-    <label>3. 安定板・周回</label>
-    <div class="tilt-grid">
+    <label>2. 形式（安定板/周回）</label>
+    <div class="grid-2">
         <select id="stabilizer">
             <option value="安定板：無">安定板：無</option>
             <option value="安定板：有">安定板：有</option>
@@ -51,43 +53,59 @@
         </select>
     </div>
 
-    <label>4. 天候・風</label>
+    <label>3. 天候・風・波</label>
     <select id="weather">
-        <option value="晴れ">晴れ</option><option value="曇り">曇り</option>
-        <option value="雨">雨</option><option value="雪">雪</option>
+        <option value="晴れ">晴れ</option><option value="曇り">曇り</option><option value="雨">雨</option><option value="雪">雪</option>
     </select>
-    <div class="tilt-grid">
-        <select id="windDir">
-            <option value="向かい風">向かい風</option>
-            <option value="追い風">追い風</option>
+    <div class="grid-2">
+        <select id="windDir"><option value="向かい風">向かい風</option><option value="追い風">追い風</option></select>
+        <select id="windSpeed">
+            <script>for(let i=0;i<=11;i++) document.write(`<option value="${i}m">${i}m</option>`)</script>
         </select>
-        <input type="text" id="windSpeed" placeholder="風速(m)">
     </div>
-    <input type="text" id="waveHeight" placeholder="波高(cm)" style="margin-top:10px;">
+    <select id="waveHeight" style="margin-top:10px;">
+        <script>for(let i=0;i<=15;i++) document.write(`<option value="${i}cm">${i}cm</option>`)</script>
+    </select>
 
-    <label>5. 進入隊形</label>
-    <input type="text" id="entryLine" placeholder="例: 123/456">
-
-    <label>6. チルト角度</label>
-    <div class="tilt-grid">
+    <label>4. 進入・チルト</label>
+    <input type="text" id="entryLine" placeholder="進入例: 123/456">
+    <div class="grid-2" style="margin-top:10px;">
         <script>
             for(let i=1;i<=6;i++) {
-                document.write(`<div>${i}号艇<select id="tilt${i}">
-                    <option value="-0.5">-0.5</option><option value="0">0</option>
-                    <option value="0.5">0.5</option><option value="1">1</option>
-                </select></div>`);
+                document.write(`<div>${i}号艇<select id="tilt${i}"><option value="-0.5">-0.5</option><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option></select></div>`);
             }
         </script>
     </div>
 
-    <label>7. 部品交換・備考</label>
-    <input type="text" id="parts" placeholder="例: 3号艇ピストン交換">
+    <label>5. 部品交換 ✅</label>
+    <div id="parts-section">
+        <script>
+            const partsList = ["ピストン", "リング1", "リング2", "電機", "キャブ", "シリンダ", "クランク", "ギア", "ボデー", "プロペラ"];
+            for(let i=1;i<=6;i++) {
+                document.write(`<div class="parts-container"><strong>${i}号艇</strong><div class="parts-grid">`);
+                partsList.forEach(p => {
+                    document.write(`<div class="part-item"><input type="checkbox" class="p-check" data-boat="${i}" value="${p}">${p}</div>`);
+                });
+                document.write(`</div></div>`);
+            }
+        </script>
+    </div>
+
+    <label>6. その他（備考）</label>
+    <input type="text" id="memo" placeholder="例: 3号艇ボート28に変更">
 
     <button onclick="copyToClipboard()">憲法プロンプトを生成・コピー</button>
 </div>
 
 <script>
 function copyToClipboard() {
+    let partsText = "";
+    for(let i=1;i<=6;i++) {
+        let selected = Array.from(document.querySelectorAll(`.p-check[data-boat="${i}"]:checked`)).map(c => c.value);
+        if(selected.length > 0) partsText += `・${i}号艇: ${selected.join(', ')}\n`;
+    }
+    if(!partsText) partsText = "なし\n";
+
     const text = `以下の条件で、私の【舟券推理の基本フローチャート】に従って分析を開始してください。
 
 【基本情報】
@@ -97,17 +115,20 @@ function copyToClipboard() {
 
 【気象条件】
 ・天候: ${document.getElementById('weather').value}
-・風況: ${document.getElementById('windDir').value} ${document.getElementById('windSpeed').value}m
-・波高: ${document.getElementById('waveHeight').value}cm
+・風況: ${document.getElementById('windDir').value} ${document.getElementById('windSpeed').value}
+・波高: ${document.getElementById('waveHeight').value}
 
 【直前気配】
 ・進入隊形: ${document.getElementById('entryLine').value}
 ・チルト: 1:[${document.getElementById('tilt1').value}] 2:[${document.getElementById('tilt2').value}] 3:[${document.getElementById('tilt3').value}] 4:[${document.getElementById('tilt4').value}] 5:[${document.getElementById('tilt5').value}] 6:[${document.getElementById('tilt6').value}]
-・部品交換/備考: ${document.getElementById('parts').value || '特になし'}
+・部品交換:
+${partsText}
+【その他備考】
+・${document.getElementById('memo').value || '特になし'}
 
-※まずは、これから送る画像（出走表・展示データ）の数字と選手名を、一文字ずつ正確に書き起こしてください。書き起こしが完了してから、憲法に基づいた分析ステップに進んでください。`;
+※まずは、これから送る画像（出走表・展示データ）の数字と選手名を、一文字ずつ正確に書き起こしてください。書き起こし完了後に分析へ進みます。`;
 
-    navigator.clipboard.writeText(text).then(() => alert('コピーしました！Geminiに貼り付けてください。'));
+    navigator.clipboard.writeText(text).then(() => alert('コピーしました！'));
 }
 </script>
 </body>
