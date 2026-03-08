@@ -3,23 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>桐生憲法・完全版エディタ</title>
+    <title>桐生憲法・操作性重視エディタ</title>
     <style>
         body { font-family: sans-serif; background-color: #121212; color: #e0e0e0; padding: 15px; font-size: 14px; }
-        .container { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .container { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; }
         h2 { text-align: center; color: #4dabf7; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         label { display: block; margin-top: 15px; font-weight: bold; color: #4dabf7; }
         select, input[type="text"] { width: 100%; padding: 12px; margin-top: 5px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
-        
-        /* 部品交換エリア */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; align-items: center; }
+        .weather-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 5px; }
+        .weather-row select { width: 70px; margin-top: 0; padding: 8px; }
         .parts-container { margin-top: 10px; background: #252525; padding: 10px; border-radius: 5px; border-left: 3px solid #007bff; }
         .parts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 12px; margin-top: 5px; }
         .part-item { display: flex; align-items: center; }
         .part-item input { margin-right: 5px; transform: scale(1.2); }
-
-        button { width: 100%; padding: 18px; margin-top: 30px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:active { background: #0056b3; transform: scale(0.98); }
+        button { width: 100%; padding: 18px; margin-top: 30px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -54,18 +52,26 @@
     </div>
 
     <label>3. 天候・風・波</label>
-    <select id="weather">
-        <option value="晴れ">晴れ</option><option value="曇り">曇り</option><option value="雨">雨</option><option value="雪">雪</option>
-    </select>
     <div class="grid-2">
-        <select id="windDir"><option value="向かい風">向かい風</option><option value="追い風">追い風</option></select>
-        <select id="windSpeed">
-            <script>for(let i=0;i<=11;i++) document.write(`<option value="${i}m">${i}m</option>`)</script>
+        <select id="weather">
+            <option value="晴れ">晴れ</option><option value="曇り">曇り</option><option value="雨">雨</option><option value="雪">雪</option>
+        </select>
+        <select id="windDir">
+            <option value="向かい風">向かい風</option><option value="追い風">追い風</option><option value="無風">無風</option>
         </select>
     </div>
-    <select id="waveHeight" style="margin-top:10px;">
-        <script>for(let i=0;i<=15;i++) document.write(`<option value="${i}cm">${i}cm</option>`)</script>
-    </select>
+    <div class="weather-row">
+        <span>風速</span>
+        <select id="windSpeed">
+            <script>for(let i=0;i<=12;i++) document.write(`<option value="${i}">${i}</option>`)</script>
+        </select>
+        <span>m</span>
+        <span style="margin-left:10px;">波高</span>
+        <select id="waveHeight">
+            <script>for(let i=0;i<=15;i++) document.write(`<option value="${i}">${i}</option>`)</script>
+        </select>
+        <span>cm</span>
+    </div>
 
     <label>4. 進入・チルト</label>
     <input type="text" id="entryLine" placeholder="進入例: 123/456">
@@ -115,8 +121,8 @@ function copyToClipboard() {
 
 【気象条件】
 ・天候: ${document.getElementById('weather').value}
-・風況: ${document.getElementById('windDir').value} ${document.getElementById('windSpeed').value}
-・波高: ${document.getElementById('waveHeight').value}
+・風況: ${document.getElementById('windDir').value} ${document.getElementById('windSpeed').value}m
+・波高: ${document.getElementById('waveHeight').value}cm
 
 【直前気配】
 ・進入隊形: ${document.getElementById('entryLine').value}
@@ -126,7 +132,7 @@ ${partsText}
 【その他備考】
 ・${document.getElementById('memo').value || '特になし'}
 
-※まずは、これから送る画像（出走表・展示データ）の数字と選手名を、一文字ずつ正確に書き起こしてください。書き起こし完了後に分析へ進みます。`;
+※まずは、これから送る画像（出走表・展示データ）の数字と選手名を、一文字ずつ正確に書き起こしてください。`;
 
     navigator.clipboard.writeText(text).then(() => alert('コピーしました！'));
 }
