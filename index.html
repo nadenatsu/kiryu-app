@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>桐生憲法・操作性重視エディタ</title>
+    <title>桐生憲法・スマートエディタ</title>
     <style>
         body { font-family: sans-serif; background-color: #121212; color: #e0e0e0; padding: 15px; font-size: 14px; }
         .container { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; }
@@ -13,10 +13,16 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; align-items: center; }
         .weather-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 5px; }
         .weather-row select { width: 70px; margin-top: 0; padding: 8px; }
-        .parts-container { margin-top: 10px; background: #252525; padding: 10px; border-radius: 5px; border-left: 3px solid #007bff; }
+        
+        /* 折りたたみ（Details/Summary）のスタイル */
+        details { margin-top: 15px; background: #252525; border-radius: 5px; border: 1px solid #444; }
+        summary { padding: 12px; cursor: pointer; font-weight: bold; color: #4dabf7; outline: none; }
+        
+        .parts-container { margin: 10px; padding: 10px; background: #1e1e1e; border-radius: 5px; border-left: 3px solid #007bff; }
         .parts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 12px; margin-top: 5px; }
         .part-item { display: flex; align-items: center; }
         .part-item input { margin-right: 5px; transform: scale(1.2); }
+        
         button { width: 100%; padding: 18px; margin-top: 30px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
@@ -83,19 +89,21 @@
         </script>
     </div>
 
-    <label>5. 部品交換 ✅</label>
-    <div id="parts-section">
-        <script>
-            const partsList = ["ピストン", "リング1", "リング2", "電機", "キャブ", "シリンダ", "クランク", "ギア", "ボデー", "プロペラ"];
-            for(let i=1;i<=6;i++) {
-                document.write(`<div class="parts-container"><strong>${i}号艇</strong><div class="parts-grid">`);
-                partsList.forEach(p => {
-                    document.write(`<div class="part-item"><input type="checkbox" class="p-check" data-boat="${i}" value="${p}">${p}</div>`);
-                });
-                document.write(`</div></div>`);
-            }
-        </script>
-    </div>
+    <details>
+        <summary>5. 部品交換を表示する ✅</summary>
+        <div id="parts-section">
+            <script>
+                const partsList = ["ピストン", "リング1", "リング2", "電機", "キャブ", "シリンダ", "クランク", "ギア", "ボデー", "プロペラ"];
+                for(let i=1;i<=6;i++) {
+                    document.write(`<div class="parts-container"><strong>${i}号艇</strong><div class="parts-grid">`);
+                    partsList.forEach(p => {
+                        document.write(`<div class="part-item"><input type="checkbox" class="p-check" data-boat="${i}" value="${p}">${p}</div>`);
+                    });
+                    document.write(`</div></div>`);
+                }
+            </script>
+        </div>
+    </details>
 
     <label>6. その他（備考）</label>
     <input type="text" id="memo" placeholder="例: 3号艇ボート28に変更">
