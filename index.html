@@ -16,8 +16,8 @@
         .tilt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .tilt-box { background: #252525; padding: 10px; border-radius: 8px; }
         button { width: 100%; padding: 16px; margin-top: 30px; background: #228be6; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; }
-        details { margin-top: 15px; background: #252525; border-radius: 8px; }
-        summary { padding: 12px; cursor: pointer; color: #4dabf7; font-weight: bold; }
+        details { margin-top: 15px; background: #252525; border-radius: 8px; overflow: hidden; }
+        summary { padding: 12px; cursor: pointer; color: #4dabf7; font-weight: bold; display: flex; align-items: center; justify-content: space-between; }
         .parts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 15px; }
     </style>
 </head>
@@ -55,7 +55,7 @@
     <h3>3. 進入・チルト</h3>
     <input type="text" id="entry" placeholder="進入例: 123/456" style="margin-bottom:15px">
     <div class="tilt-grid">
-        <script>for(let i=1; i<=6; i++) { document.write(`<div class="tilt-box"><label>${i}号艇</label><select id="tilt${i}"><option value="-0.5">-0.5</option><option value="0.0">0.0</option><option value="0.5">0.5</option></select></div>`); }</script>
+        <script>for(let i=1; i<=6; i++) { document.write(`<div class="tilt-box"><label>${i}号艇</label><select id="tilt${i}"><option value="-0.5">-0.5</option><option value="0.0">0.0</option><option value="0.5">0.5</option><option value="1.0">1.0</option><option value="1.5">1.5</option><option value="2.0">2.0</option><option value="2.5">2.5</option><option value="3.0">3.0</option></select></div>`); }</script>
     </div>
 
     <details>
@@ -68,7 +68,21 @@
 </div>
 <script>
     function copyData(){
-        const res = `・${document.getElementById('month').value} ${document.getElementById('day').value}\n・${document.getElementById('race').value} ${document.getElementById('time').value}${document.getElementById('nighter').checked?'【ナイター✓】':''}\n・風速${document.getElementById('wind_s').value} 波高${document.getElementById('wave').value}\n・進入:${document.getElementById('entry').value}`;
+        const month = document.getElementById('month').value;
+        const race = document.getElementById('race').value;
+        const day = document.getElementById('day').value;
+        const time = document.getElementById('time').value;
+        const nighter = document.getElementById('nighter').checked ? "【ナイター✓】" : "";
+        const wind_s = document.getElementById('wind_s').value;
+        const wave = document.getElementById('wave').value;
+        const entry = document.getElementById('entry').value;
+        let tilts = "【チルト】";
+        for(let i=1; i<=6; i++) tilts += `${i}:${document.getElementById('tilt'+i).value} `;
+
+        const parts = Array.from(document.querySelectorAll('.parts-grid input:checked')).map(el => el.value);
+        const partsText = parts.length > 0 ? `\n【部品交換】${parts.join(', ')}` : "";
+
+        const res = `・${month} ${day}\n・${race} ${time}${nighter}\n・風速${wind_s} 波高${wave}\n・進入:${entry}\n${tilts}${partsText}`;
         navigator.clipboard.writeText(res).then(()=>alert("コピーしました 🐼"));
     }
 </script>
