@@ -8,7 +8,8 @@
         body { font-family: sans-serif; background-color: #1a1a1a; color: #ffffff; padding: 15px; margin: 0; }
         .container { max-width: 500px; margin: auto; }
         h3 { color: #4dabf7; font-size: 1.0em; margin: 20px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        select, input[type="text"] { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #2d2d2d; color: white; box-sizing: border-box; font-size: 1em; appearance: none; }
+        select, input[type="text"], textarea { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #2d2d2d; color: white; box-sizing: border-box; font-size: 1em; appearance: none; }
+        textarea { height: 80px; resize: none; font-family: sans-serif; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .flex-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
         .nighter-area { display: flex; align-items: center; gap: 4px; color: #4dabf7; font-weight: bold; }
@@ -35,7 +36,7 @@
         <select id="time" style="flex: 2;">
             <script>for(let h=15; h<=21; h++){for(let m=0; m<=45; m+=15){if(h===15 && m<15)continue; if(h===21 && m>30)break; let t=`${h}:${String(m).padStart(2,'0')}`; document.write(`<option value="${t}">${t}</option>`);}}</script>
         </select>
-        <div class="nighter-area"><input type="checkbox" id="nighter"> <label for="nighter">ナイター【✅】</label></div>
+        <div class="nighter-area"><input type="checkbox" id="nighter"> <label for="nighter">ナイター✅</label></div>
     </div>
 
     <h3>○安定板/周回</h3>
@@ -75,6 +76,9 @@
         }
     </script>
 
+    <h3>○その他（備考）</h3>
+    <textarea id="memo" placeholder="特記事項があれば入力してください"></textarea>
+
     <button onclick="copyData()">分析テキストをコピー 🐼</button>
 </div>
 <script>
@@ -93,8 +97,10 @@
             const checked = Array.from(document.querySelectorAll(`#parts${i} input:checked`)).map(el => el.value);
             if(checked.length > 0) partsAll += `\n・${i}号艇 部品交換【${checked.join(', ')}】`;
         }
+
+        const memoText = document.getElementById('memo').value ? `\n\n【備考】\n${document.getElementById('memo').value}` : "";
         
-        navigator.clipboard.writeText(res.join('\n') + partsAll).then(()=>alert("コピーしました 🐼"));
+        navigator.clipboard.writeText(res.join('\n') + partsAll + memoText).then(()=>alert("コピーしました 🐼"));
     }
 </script>
 </body>
