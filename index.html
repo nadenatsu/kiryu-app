@@ -1,152 +1,76 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <link rel="apple-touch-icon" href="/Icon.png.jpg">
-
-　　 <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>桐生憲法・スマートエディタ</title>
+    <title>桐生憲法・パンダエディター v2</title>
+    <link rel="apple-touch-icon" href="/Icon.png.jpg">
     <style>
-        body { font-family: sans-serif; background-color: #121212; color: #e0e0e0; padding: 15px; font-size: 14px; }
-        .container { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; }
-        h2 { text-align: center; color: #4dabf7; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        label { display: block; margin-top: 15px; font-weight: bold; color: #4dabf7; }
-        select, input[type="text"] { width: 100%; padding: 12px; margin-top: 5px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; align-items: center; }
-        .weather-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 5px; }
-        .weather-row select { width: 70px; margin-top: 0; padding: 8px; }
-        
-        /* 折りたたみ（Details/Summary）のスタイル */
-        details { margin-top: 15px; background: #252525; border-radius: 5px; border: 1px solid #444; }
-        summary { padding: 12px; cursor: pointer; font-weight: bold; color: #4dabf7; outline: none; }
-        
-        .parts-container { margin: 10px; padding: 10px; background: #1e1e1e; border-radius: 5px; border-left: 3px solid #007bff; }
-        .parts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 12px; margin-top: 5px; }
-        .part-item { display: flex; align-items: center; }
-        .part-item input { margin-right: 5px; transform: scale(1.2); }
-        
-        button { width: 100%; padding: 18px; margin-top: 30px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        body { font-family: sans-serif; background-color: #1a1a1a; color: #ffffff; padding: 15px; margin: 0; }
+        .container { max-width: 500px; margin: auto; }
+        h3 { color: #4dabf7; font-size: 1.1em; margin: 25px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        select, input[type="text"] { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #2d2d2d; color: white; box-sizing: border-box; font-size: 1em; appearance: none; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .flex-row { display: flex; align-items: center; gap: 8px; }
+        .nighter-area { display: flex; align-items: center; gap: 4px; color: #4dabf7; font-weight: bold; font-size: 0.9em; }
+        .tilt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .tilt-box { background: #252525; padding: 10px; border-radius: 8px; }
+        button { width: 100%; padding: 16px; margin-top: 30px; background: #228be6; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; }
+        details { margin-top: 15px; background: #252525; border-radius: 8px; }
+        summary { padding: 12px; cursor: pointer; color: #4dabf7; font-weight: bold; }
+        .parts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 15px; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>桐生 憲法予想入力</h2>
-    
-    <label>1. 月・レース・進行</label>
+    <h3>1. 月・レース・進行</h3>
     <div class="grid-2">
-        <select id="month">
-            <script>for(let i=1;i<=12;i++) document.write(`<option value="${i}月">${i}月</option>`)</script>
-        </select>
-        <select id="raceNum">
-            <script>for(let i=1;i<=12;i++) document.write(`<option value="${i}R">${i}R</option>`)</script>
+        <select id="month"><script>for(let i=1; i<=12; i++) document.write(`<option value="${i}月">${i}月</option>`);</script></select>
+        <select id="race"><script>for(let i=1; i<=12; i++) document.write(`<option value="${i}R">${i}R</option>`);</script></select>
+    </div>
+    <div style="margin-bottom: 12px;">
+        <select id="day">
+            <option value="初日">初日</option><option value="2日目">2日目</option><option value="3日目">3日目</option>
+            <option value="4日目">4日目</option><option value="5日目">5日目</option><option value="6日目">6日目</option><option value="最終日">最終日</option>
         </select>
     </div>
-    <select id="dayType" style="margin-top:10px;">
-        <option value="初日">初日</option><option value="2日目">2日目</option><option value="3日目">3日目</option>
-        <option value="4日目">4日目</option><option value="5日目">5日目</option><option value="6日目">6日目</option>
-        <option value="最終日">最終日</option>
-    </select>
-
-    <label>2. 形式（安定板/周回）</label>
-    <div class="grid-2">
-        <select id="stabilizer">
-            <option value="安定板：無">安定板：無</option>
-            <option value="安定板：有">安定板：有</option>
+    <div class="flex-row">
+        <select id="time" style="flex: 2;">
+            <option value="15:15">15:15</option><option value="15:30">15:30</option><option value="16:00">16:00</option>
+            <script>for(let h=16; h<=21; h++){for(let m=15; m<=45; m+=15){if(h===21 && m>30)break; let t=`${h}:${m}`; document.write(`<option value="${t}">${t}</option>`);}}</script>
         </select>
-        <select id="laps">
-            <option value="3周戦">3周戦</option>
-            <option value="2周戦">2周戦</option>
-        </select>
+        <div class="nighter-area"><input type="checkbox" id="nighter"> <label for="nighter" style="color:#4dabf7">ナイター✓</label></div>
     </div>
 
-    <label>3. 天候・風・波</label>
+    <h3>2. 天候・風・波</h3>
     <div class="grid-2">
-        <select id="weather">
-            <option value="晴れ">晴れ</option><option value="曇り">曇り</option><option value="雨">雨</option><option value="雪">雪</option>
-        </select>
-        <select id="windDir">
-            <option value="向かい風">向かい風</option><option value="追い風">追い風</option><option value="無風">無風</option>
-        </select>
+        <select id="weather"><option value="晴れ">晴れ</option><option value="曇り">曇り</option><option value="雨">雨</option></select>
+        <select id="wind_dir"><option value="向かい風">向かい風</option><option value="追い風">追い風</option></select>
     </div>
-    <div class="weather-row">
-        <span>風速</span>
-        <select id="windSpeed">
-            <script>for(let i=0;i<=12;i++) document.write(`<option value="${i}">${i}</option>`)</script>
-        </select>
-        <span>m</span>
-        <span style="margin-left:10px;">波高</span>
-        <select id="waveHeight">
-            <script>for(let i=0;i<=15;i++) document.write(`<option value="${i}">${i}</option>`)</script>
-        </select>
-        <span>cm</span>
+    <div class="grid-2">
+        <div class="flex-row"><select id="wind_s"><script>for(let i=0; i<=10; i++) document.write(`<option value="${i}m">${i}m</option>`);</script></select><span>風速</span></div>
+        <div class="flex-row"><select id="wave"><script>for(let i=0; i<=10; i++) document.write(`<option value="${i}cm">${i}cm</option>`);</script></select><span>波高</span></div>
     </div>
 
-    <label>4. 進入・チルト</label>
-    <input type="text" id="entryLine" placeholder="進入例: 123/456">
-    <div class="grid-2" style="margin-top:10px;">
-        <script>
-            for(let i=1;i<=6;i++) {
-                document.write(`<div>${i}号艇<select id="tilt${i}"><option value="-0.5">-0.5</option><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option></select></div>`);
-            }
-        </script>
+    <h3>3. 進入・チルト</h3>
+    <input type="text" id="entry" placeholder="進入例: 123/456" style="margin-bottom:15px">
+    <div class="tilt-grid">
+        <script>for(let i=1; i<=6; i++) { document.write(`<div class="tilt-box"><label>${i}号艇</label><select id="tilt${i}"><option value="-0.5">-0.5</option><option value="0.0">0.0</option><option value="0.5">0.5</option></select></div>`); }</script>
     </div>
 
     <details>
-        <summary>5. 部品交換を表示する ✅</summary>
-        <div id="parts-section">
-            <script>
-                const partsList = ["ピストン", "リング1", "リング2", "電機", "キャブ", "シリンダ", "クランク", "ギア", "ボデー", "プロペラ"];
-                for(let i=1;i<=6;i++) {
-                    document.write(`<div class="parts-container"><strong>${i}号艇</strong><div class="parts-grid">`);
-                    partsList.forEach(p => {
-                        document.write(`<div class="part-item"><input type="checkbox" class="p-check" data-boat="${i}" value="${p}">${p}</div>`);
-                    });
-                    document.write(`</div></div>`);
-                }
-            </script>
+        <summary>▶ 4. 部品交換を表示する ✅</summary>
+        <div class="parts-grid">
+            <script>const p=["ピストン","リング","シリンダ","クランク","キャリア","電気","ギヤ","プロペラ"]; p.forEach(x=>document.write(`<div><input type="checkbox" value="${x}"> ${x}</div>`));</script>
         </div>
     </details>
-
-    <label>6. その他（備考）</label>
-    <input type="text" id="memo" placeholder="例: 3号艇ボート28に変更">
-
-    <button onclick="copyToClipboard()">憲法プロンプトを生成・コピー</button>
+    <button onclick="copyData()">分析テキストをコピー 🐼</button>
 </div>
-
 <script>
-function copyToClipboard() {
-    let partsText = "";
-    for(let i=1;i<=6;i++) {
-        let selected = Array.from(document.querySelectorAll(`.p-check[data-boat="${i}"]:checked`)).map(c => c.value);
-        if(selected.length > 0) partsText += `・${i}号艇: ${selected.join(', ')}\n`;
+    function copyData(){
+        const res = `・${document.getElementById('month').value} ${document.getElementById('day').value}\n・${document.getElementById('race').value} ${document.getElementById('time').value}${document.getElementById('nighter').checked?'【ナイター✓】':''}\n・風速${document.getElementById('wind_s').value} 波高${document.getElementById('wave').value}\n・進入:${document.getElementById('entry').value}`;
+        navigator.clipboard.writeText(res).then(()=>alert("コピーしました 🐼"));
     }
-    if(!partsText) partsText = "なし\n";
-
-    const text = `以下の条件で、私の【舟券推理の基本フローチャート】に従って分析を開始してください。
-
-【基本情報】
-・開催時期: ${document.getElementById('month').value} (${document.getElementById('dayType').value})
-・対象レース: ${document.getElementById('raceNum').value}
-・レース形式: ${document.getElementById('stabilizer').value} / ${document.getElementById('laps').value}
-
-【気象条件】
-・天候: ${document.getElementById('weather').value}
-・風況: ${document.getElementById('windDir').value} ${document.getElementById('windSpeed').value}m
-・波高: ${document.getElementById('waveHeight').value}cm
-
-【直前気配】
-・進入隊形: ${document.getElementById('entryLine').value}
-・チルト: 1:[${document.getElementById('tilt1').value}] 2:[${document.getElementById('tilt2').value}] 3:[${document.getElementById('tilt3').value}] 4:[${document.getElementById('tilt4').value}] 5:[${document.getElementById('tilt5').value}] 6:[${document.getElementById('tilt6').value}]
-・部品交換:
-${partsText}
-【その他備考】
-・${document.getElementById('memo').value || '特になし'}
-
-※まずは、これから送る画像（出走表・展示データ）の数字と選手名を、一文字ずつ正確に書き起こしてください。`;
-
-    navigator.clipboard.writeText(text).then(() => alert('コピーしました！'));
-}
 </script>
 </body>
 </html>
-
