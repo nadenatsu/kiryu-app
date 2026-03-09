@@ -3,96 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>桐生憲法・パンダエディター完全版</title>
-    <link rel="apple-touch-icon" href="/Icon.png.jpg">
+    <title>桐生憲法・パンダエディター</title>
     <style>
         body { font-family: sans-serif; background-color: #1a1a1a; color: #ffffff; padding: 15px; margin: 0; }
         .container { max-width: 500px; margin: auto; }
-        h3 { color: #4dabf7; font-size: 1.1em; margin: 25px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        h3 { color: #4dabf7; font-size: 1.0em; margin: 20px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
         select, input[type="text"] { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #2d2d2d; color: white; box-sizing: border-box; font-size: 1em; appearance: none; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .flex-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-        .nighter-area { display: flex; align-items: center; gap: 4px; color: #4dabf7; font-weight: bold; font-size: 0.9em; white-space: nowrap; }
-        .tilt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .tilt-box { background: #252525; padding: 10px; border-radius: 8px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .flex-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .nighter-area { display: flex; align-items: center; gap: 4px; color: #4dabf7; font-weight: bold; }
+        .tilt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .tilt-box { background: #252525; padding: 10px; border-radius: 8px; border: 1px solid #333; }
         button { width: 100%; padding: 16px; margin-top: 30px; background: #228be6; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; }
-        details { margin-top: 15px; background: #252525; border-radius: 8px; overflow: hidden; }
-        summary { padding: 12px; cursor: pointer; color: #4dabf7; font-weight: bold; }
-        .parts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 15px; }
+        details { margin-top: 10px; background: #252525; border-radius: 8px; border: 1px solid #333; }
+        summary { padding: 12px; cursor: pointer; color: #4dabf7; font-size: 0.9em; }
+        .parts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px; font-size: 0.8em; }
+        .parts-grid label { display: flex; align-items: center; gap: 4px; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h3>1. 月・進行・レース</h3>
+    <h3>○月・進行・レース・時間</h3>
     <div class="grid-2">
         <select id="month"><script>for(let i=1; i<=12; i++) document.write(`<option value="${i}月">${i}月</option>`);</script></select>
         <select id="day">
-            <option value="初日">初日</option><option value="2日目">2日目</option><option value="3日目">3日目</option>
-            <option value="4日目">4日目</option><option value="5日目">5日目</option><option value="6日目">6日目</option><option value="最終日">最終日</option>
+            <option value="初日">初日</option><script>for(let i=2; i<=6; i++) document.write(`<option value="${i}日目">${i}日目</option>`);</script><option value="最終日">最終日</option>
         </select>
     </div>
     <div class="flex-row">
         <select id="race" style="width: 80px;"><script>for(let i=1; i<=12; i++) document.write(`<option value="${i}R">${i}R</option>`);</script></select>
         <select id="time" style="flex: 2;">
-            <option value="15:15">15:15</option><option value="15:30">15:30</option><option value="15:45">15:45</option>
-            <script>for(let h=16; h<=21; h++){for(let m=0; m<=45; m+=15){if(h===21 && m>30)break; let t=`${h}:${String(m).padStart(2,'0')}`; document.write(`<option value="${t}">${t}</option>`);}}</script>
+            <script>for(let h=15; h<=21; h++){for(let m=0; m<=45; m+=15){if(h===15 && m<15)continue; if(h===21 && m>30)break; let t=`${h}:${String(m).padStart(2,'0')}`; document.write(`<option value="${t}">${t}</option>`);}}</script>
         </select>
-        <div class="nighter-area"><input type="checkbox" id="nighter"> <label for="nighter" style="color:#4dabf7">ナイター✓</label></div>
+        <div class="nighter-area"><input type="checkbox" id="nighter"> <label for="nighter">ナイター【✅】</label></div>
     </div>
 
-    <h3>2. 形式（安定板/周回）</h3>
+    <h3>○安定板/周回</h3>
     <div class="grid-2">
-        <select id="stabilizer"><option value="安定板：無">安定板：無</option><option value="安定板：有">安定板：有</option></select>
+        <select id="stabilizer"><option value="安定：無">安定：無</option><option value="安定：有">安定：有</option></select>
         <select id="laps"><option value="3周戦">3周戦</option><option value="2周戦">2周戦</option></select>
     </div>
 
-    <h3>3. 天候・風・波</h3>
+    <h3>○天候・風・波</h3>
     <div class="grid-2">
         <select id="weather"><option value="晴れ">晴れ</option><option value="曇り">曇り</option><option value="雨">雨</option><option value="雪">雪</option></select>
-        <select id="wind_dir"><option value="向かい風">向かい風</option><option value="追い風">追い風</option><option value="横風">横風</option><option value="安定">安定</option></select>
+        <select id="wind_dir"><option value="無風">無風</option><option value="向かい風">向かい風</option><option value="追い風">追い風</option></select>
     </div>
     <div class="grid-2">
-        <div class="flex-row" style="margin:0;"><select id="wind_s"><script>for(let i=0; i<=10; i++) document.write(`<option value="${i}m">${i}m</option>`);</script></select><span style="font-size:0.9em">風速</span></div>
-        <div class="flex-row" style="margin:0;"><select id="wave"><script>for(let i=0; i<=10; i++) document.write(`<option value="${i}cm">${i}cm</option>`);</script></select><span style="font-size:0.9em">波高</span></div>
+        <div class="flex-row" style="margin:0;"><span style="font-size:0.9em">風速</span><select id="wind_s"><script>for(let i=0; i<=10; i++) document.write(`<option value="${i}m">${i}m</option>`);</script></select></div>
+        <div class="flex-row" style="margin:0;"><span style="font-size:0.9em">波高</span><select id="wave"><script>for(let i=0; i<=10; i++) document.write(`<option value="${i}cm">${i}cm</option>`);</script></select></div>
     </div>
 
-    <h3>4. 進入・チルト</h3>
-    <input type="text" id="entry" placeholder="進入例: 123/456" style="margin-bottom:15px">
+    <h3>○進入・チルト角度</h3>
+    <input type="text" id="entry" placeholder="記入例123/456" style="margin-bottom:12px">
     <div class="tilt-grid">
-        <script>const t_opts = ["-0.5","0.0","0.5","1.0","1.5","2.0","2.5","3.0"]; for(let i=1; i<=6; i++) { document.write(`<div class="tilt-box"><label>${i}号艇</label><select id="tilt${i}">${t_opts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`); }</script>
+        <script>const t_opts=["-0.5","0","0.5","1"]; for(let i=1; i<=6; i++) { document.write(`<div class="tilt-box"><label>${i}号艇</label><select id="tilt${i}">${t_opts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`); }</script>
     </div>
 
-    <details>
-        <summary>▶ 5. 部品交換を表示する ✅</summary>
-        <div class="parts-grid">
-            <script>const p=["ピストン","リング","シリンダ","クランク","キャリア","電気","ギヤ","プロペラ"]; p.forEach(x=>document.write(`<div><input type="checkbox" value="${x}"> ${x}</div>`));</script>
-        </div>
-    </details>
+    <h3>○▼部品交換（各号艇）</h3>
+    <script>
+        const parts = ["ピストン", "ピストンリング1", "ピストンリング2", "ギアケース", "電気一式", "キャブレタ", "クランクシャフト", "シリンダーケース", "キャリアボデー", "プロペラ"];
+        for(let i=1; i<=6; i++) {
+            document.write(`
+                <details>
+                    <summary>${i}号艇 部品交換 ✅</summary>
+                    <div class="parts-grid" id="parts${i}">
+                        ${parts.map(p => `<label><input type="checkbox" value="${p}"> ${p}</label>`).join('')}
+                    </div>
+                </details>
+            `);
+        }
+    </script>
+
     <button onclick="copyData()">分析テキストをコピー 🐼</button>
 </div>
 <script>
     function copyData(){
-        const m = document.getElementById('month').value;
-        const d = document.getElementById('day').value;
-        const r = document.getElementById('race').value;
-        const t = document.getElementById('time').value;
-        const n = document.getElementById('nighter').checked ? "【ナイター✓】" : "";
-        const stab = document.getElementById('stabilizer').value;
-        const lap = document.getElementById('laps').value;
-        const w = document.getElementById('weather').value;
-        const wd = document.getElementById('wind_dir').value;
-        const ws = document.getElementById('wind_s').value;
-        const wv = document.getElementById('wave').value;
-        const ent = document.getElementById('entry').value;
-        let tilts = "【チルト】";
-        for(let i=1; i<=6; i++) tilts += `${i}:${document.getElementById('tilt'+i).value} `;
-        const parts = Array.from(document.querySelectorAll('.parts-grid input:checked')).map(el => el.value);
-        const pText = parts.length > 0 ? `\n【部品交換】${parts.join(', ')}` : "";
-
-        const res = `・${m} ${d}\n・${r} ${t}${n}\n・${stab}・${lap}\n・${w} ${wd}(風速${ws} 波高${wv})\n・進入:${ent}\n${tilts}${pText}`;
-        navigator.clipboard.writeText(res).then(()=>alert("コピーしました 🐼"));
+        const res = [
+            `・${document.getElementById('month').value} ${document.getElementById('day').value}`,
+            `・${document.getElementById('race').value} 時間(${document.getElementById('time').value}) ${document.getElementById('nighter').checked?'ナイター【✅】':''}`,
+            `・${document.getElementById('stabilizer').value}・${document.getElementById('laps').value}`,
+            `・${document.getElementById('weather').value} ${document.getElementById('wind_dir').value} (風速${document.getElementById('wind_s').value} 波高${document.getElementById('wave').value})`,
+            `・進入:${document.getElementById('entry').value}`,
+            `・チルト ` + [1,2,3,4,5,6].map(i => `${i}:(${document.getElementById('tilt'+i).value})`).join(' ')
+        ];
+        
+        let partsAll = "";
+        for(let i=1; i<=6; i++) {
+            const checked = Array.from(document.querySelectorAll(`#parts${i} input:checked`)).map(el => el.value);
+            if(checked.length > 0) partsAll += `\n・${i}号艇 部品交換【${checked.join(', ')}】`;
+        }
+        
+        navigator.clipboard.writeText(res.join('\n') + partsAll).then(()=>alert("コピーしました 🐼"));
     }
 </script>
 </body>
 </html>
-
