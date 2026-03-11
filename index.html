@@ -22,6 +22,7 @@
         summary { padding: 12px; cursor: pointer; color: #4dabf7; font-size: 0.9em; }
         .parts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px; font-size: 0.8em; }
         .parts-grid label { display: flex; align-items: center; gap: 4px; }
+        .nested-details { margin: 5px 10px 10px; border: 1px solid #444; }
     </style>
 </head>
 <body>
@@ -69,35 +70,41 @@
         <script>const t_opts=["-0.5","0","0.5","1"]; for(let i=1; i<=6; i++) { document.write(`<div class="tilt-box"><label>${i}号艇</label><select id="tilt${i}">${t_opts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`); }</script>
     </div>
 
-    <h3>○▼部品交換（各号艇）</h3>
-    <script>
-        const parts = ["ピストン", "ピストンリング1", "ピストンリング2", "ギアケース", "電気一式", "キャブレタ", "クランクシャフト", "シリンダーケース", "キャリアボデー", "プロペラ"];
-        for(let i=1; i<=6; i++) {
-            document.write(`
-                <details>
-                    <summary>${i}号艇 部品交換 ✅</summary>
-                    <div class="parts-grid" id="parts${i}">
-                        ${parts.map(p => `<label><input type="checkbox" value="${p}"> ${p}</label>`).join('')}
-                    </div>
-                </details>
-            `);
-        }
-    </script>
+    <h3>○部品交換（全部艇）</h3>
+    <details>
+        <summary>▼ 部品交換を開く</summary>
+        <script>
+            const parts = ["ピストン", "ピストンリング1", "ピストンリング2", "ギアケース", "電気一式", "キャブレタ", "クランクシャフト", "シリンダーケース", "キャリアボデー", "プロペラ"];
+            for(let i=1; i<=6; i++) {
+                document.write(`
+                    <details class="nested-details">
+                        <summary>${i}号艇 ✅</summary>
+                        <div class="parts-grid" id="parts${i}">
+                            ${parts.map(p => `<label><input type="checkbox" value="${p}"> ${p}</label>`).join('')}
+                        </div>
+                    </details>
+                `);
+            }
+        </script>
+    </details>
 
-    <h3>○▼重量調整（各号艇）</h3>
-    <script>
-        const weights = ["0.5kg", "1kg", "1.5kg", "2kg"];
-        for(let i=1; i<=6; i++) {
-            document.write(`
-                <details>
-                    <summary>${i}号艇 重量調整 ✅</summary>
-                    <div class="parts-grid" id="weight${i}">
-                        ${weights.map(w => `<label><input type="checkbox" value="${w}"> ${w}</label>`).join('')}
-                    </div>
-                </details>
-            `);
-        }
-    </script>
+    <h3>○重量調整（全部艇）</h3>
+    <details>
+        <summary>▼ 重量調整を開く</summary>
+        <script>
+            const weights = ["0.5kg", "1kg", "1.5kg", "2kg"];
+            for(let i=1; i<=6; i++) {
+                document.write(`
+                    <details class="nested-details">
+                        <summary>${i}号艇 ✅</summary>
+                        <div class="parts-grid" id="weight${i}">
+                            ${weights.map(w => `<label><input type="checkbox" value="${w}"> ${w}</label>`).join('')}
+                        </div>
+                    </details>
+                `);
+            }
+        </script>
+    </details>
 
     <h3>○その他（備考）</h3>
     <textarea id="memo" placeholder="特記事項があれば入力してください"></textarea>
@@ -117,11 +124,9 @@
         
         let extraInfo = "";
         for(let i=1; i<=6; i++) {
-            // 部品交換の取得
             const checkedParts = Array.from(document.querySelectorAll(`#parts${i} input:checked`)).map(el => el.value);
             if(checkedParts.length > 0) extraInfo += `\n・${i}号艇 部品交換【${checkedParts.join(', ')}】`;
             
-            // 重量調整の取得
             const checkedWeights = Array.from(document.querySelectorAll(`#weight${i} input:checked`)).map(el => el.value);
             if(checkedWeights.length > 0) extraInfo += `\n・${i}号艇 重量調整【${checkedWeights.join(', ')}】`;
         }
