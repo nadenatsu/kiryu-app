@@ -6,7 +6,7 @@
     <title>桐生憲法・パンダエディター</title>
     <link rel="apple-touch-icon" href="/Icon.png.jpg">
 
-　　　<style>
+    <style>
         body { font-family: sans-serif; background-color: #1a1a1a; color: #ffffff; padding: 15px; margin: 0; }
         .container { max-width: 500px; margin: auto; }
         h3 { color: #4dabf7; font-size: 1.0em; margin: 20px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
@@ -38,7 +38,7 @@
         <select id="time" style="flex: 2;">
             <script>for(let h=15; h<=21; h++){for(let m=0; m<=45; m+=15){if(h===15 && m<15)continue; if(h===21 && m>30)break; let t=`${h}:${String(m).padStart(2,'0')}`; document.write(`<option value="${t}">${t}</option>`);}}</script>
         </select>
-        <div class="nighter-area"><input type="checkbox" id="nighter"> <label for="nighter">ナイター✅</label></div>
+        <div class="nighter-area"><input type="checkbox" id="nighter"> <label for="nighter">ナイター</label></div>
     </div>
 
     <h3>○安定板/周回</h3>
@@ -50,7 +50,13 @@
     <h3>○天候・風・波</h3>
     <div class="grid-2">
         <select id="weather"><option value="晴れ">晴れ</option><option value="曇り">曇り</option><option value="雨">雨</option><option value="雪">雪</option></select>
-        <select id="wind_dir"><option value="無風">無風</option><option value="向かい風">向かい風</option><option value="追い風">追い風</option></select>
+        <select id="wind_dir">
+            <option value="無風">無風</option>
+            <option value="向かい風">向かい風</option>
+            <option value="追い風">追い風</option>
+            <option value="左横風">左横風</option>
+            <option value="右横風">右横風</option>
+        </select>
     </div>
     <div class="grid-2">
         <div class="flex-row" style="margin:0;"><span style="font-size:0.9em">風速</span><select id="wind_s"><script>for(let i=0; i<=10; i++) document.write(`<option value="${i}m">${i}m</option>`);</script></select></div>
@@ -78,6 +84,21 @@
         }
     </script>
 
+    <h3>○▼重量調整（各号艇）</h3>
+    <script>
+        const weights = ["0.5kg", "1kg", "1.5kg", "2kg"];
+        for(let i=1; i<=6; i++) {
+            document.write(`
+                <details>
+                    <summary>${i}号艇 重量調整 ✅</summary>
+                    <div class="parts-grid" id="weight${i}">
+                        ${weights.map(w => `<label><input type="checkbox" value="${w}"> ${w}</label>`).join('')}
+                    </div>
+                </details>
+            `);
+        }
+    </script>
+
     <h3>○その他（備考）</h3>
     <textarea id="memo" placeholder="特記事項があれば入力してください"></textarea>
 
@@ -87,22 +108,27 @@
     function copyData(){
         const res = [
             `・${document.getElementById('month').value} ${document.getElementById('day').value}`,
-            `・${document.getElementById('race').value} 時間(${document.getElementById('time').value}) ${document.getElementById('nighter').checked?'ナイター【✅】':''}`,
+            `・${document.getElementById('race').value} 時間(${document.getElementById('time').value}) ${document.getElementById('nighter').checked?'ナイター':''}`,
             `・${document.getElementById('stabilizer').value}・${document.getElementById('laps').value}`,
             `・${document.getElementById('weather').value} ${document.getElementById('wind_dir').value} (風速${document.getElementById('wind_s').value} 波高${document.getElementById('wave').value})`,
             `・進入:${document.getElementById('entry').value}`,
             `・チルト ` + [1,2,3,4,5,6].map(i => `${i}:(${document.getElementById('tilt'+i).value})`).join(' ')
         ];
         
-        let partsAll = "";
+        let extraInfo = "";
         for(let i=1; i<=6; i++) {
-            const checked = Array.from(document.querySelectorAll(`#parts${i} input:checked`)).map(el => el.value);
-            if(checked.length > 0) partsAll += `\n・${i}号艇 部品交換【${checked.join(', ')}】`;
+            // 部品交換の取得
+            const checkedParts = Array.from(document.querySelectorAll(`#parts${i} input:checked`)).map(el => el.value);
+            if(checkedParts.length > 0) extraInfo += `\n・${i}号艇 部品交換【${checkedParts.join(', ')}】`;
+            
+            // 重量調整の取得
+            const checkedWeights = Array.from(document.querySelectorAll(`#weight${i} input:checked`)).map(el => el.value);
+            if(checkedWeights.length > 0) extraInfo += `\n・${i}号艇 重量調整【${checkedWeights.join(', ')}】`;
         }
 
         const memoText = document.getElementById('memo').value ? `\n\n【備考】\n${document.getElementById('memo').value}` : "";
         
-        navigator.clipboard.writeText(res.join('\n') + partsAll + memoText).then(()=>alert("コピーしました 🐼"));
+        navigator.clipboard.writeText(res.join('\n') + extraInfo + memoText).then(()=>alert("コピーしました 🐼"));
     }
 </script>
 </body>
