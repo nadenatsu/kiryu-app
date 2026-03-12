@@ -67,7 +67,13 @@
     <h3>○進入・チルト角度</h3>
     <input type="text" id="entry" placeholder="記入例123/456" style="margin-bottom:12px">
     <div class="tilt-grid">
-        <script>const t_opts=["-0.5","0","0.5","1"]; for(let i=1; i<=6; i++) { document.write(`<div class="tilt-box"><label>${i}号艇</label><select id="tilt${i}">${t_opts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`); }</script>
+        <script>
+            // チルトの選択肢を（-0.5、0、+0.5、+1）に修正しました
+            const t_opts = ["-0.5", "0", "+0.5", "+1"]; 
+            for(let i=1; i<=6; i++) { 
+                document.write(`<div class="tilt-box"><label>${i}号艇</label><select id="tilt${i}">${t_opts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`); 
+            }
+        </script>
     </div>
 
     <h3>○部品交換（全部艇）</h3>
