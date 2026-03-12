@@ -44,7 +44,10 @@
 
     <h3>○安定板/周回</h3>
     <div class="grid-2">
-        <select id="stabilizer"><option value="安定板：無">安定板：無</option><option value="安定板：有">安定板：有</option></select>
+        <select id="stabilizer">
+            <option value="安定板：なし">安定板：なし</option>
+            <option value="安定板：あり">安定板：あり</option>
+        </select>
         <select id="laps"><option value="3周戦">3周戦</option><option value="2周戦">2周戦</option></select>
     </div>
 
@@ -68,7 +71,6 @@
     <input type="text" id="entry" placeholder="記入例123/456" style="margin-bottom:12px">
     <div class="tilt-grid">
         <script>
-            // チルトの選択肢を（-0.5、0、+0.5、+1）に修正しました
             const t_opts = ["-0.5", "0", "+0.5", "+1"]; 
             for(let i=1; i<=6; i++) { 
                 document.write(`<div class="tilt-box"><label>${i}号艇</label><select id="tilt${i}">${t_opts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`); 
