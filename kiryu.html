@@ -14,58 +14,36 @@
         .section { background: #1a1a1a; border-radius: 8px; padding: 10px; margin-bottom: 10px; border: 1px solid #333; }
         h2 { font-size: 11px; color: var(--gold); margin: 0 0 8px 0; border-bottom: 1px solid var(--gold); display: inline-block; padding-bottom: 2px; }
         textarea { width: 100%; height: 42px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; padding: 6px; font-size: 11px; box-sizing: border-box; margin-bottom: 6px; }
-        input, select { background:#222; border:1px solid #444; color:#fff; padding:6px; border-radius:4px; font-size: 11px;}
-        .flex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .btn-exec { width: 100%; background: linear-gradient(to bottom, #d4af37, #aa841e); color: #000; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-top: 5px; }
         .result-box { background: var(--navy); border: 2px solid var(--gold); padding: 15px; margin-top: 15px; border-radius: 8px; display: none; }
         .tips-group { margin-bottom: 10px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; }
         .tips-label { font-size: 10px; color: var(--gold); font-weight: bold; }
-        .tips-value { font-size: 20px; color: #fff; text-align: center; font-weight: bold; line-height: 1.6; letter-spacing: 1px; }
-        .rank-log { font-size: 10px; color: #888; border-top: 1px solid #333; padding-top: 8px; margin-top: 10px; }
+        .tips-value { font-size: 20px; color: #fff; text-align: center; font-weight: bold; line-height: 1.6; }
+        .slit-detect { font-size: 11px; color: #ice; margin-bottom: 5px; text-align: right; color: var(--ice); }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header"><h1>🔱 桐生・至上命令執行 🔱</h1></div>
     <div class="section">
-        <h2>環境設定</h2>
-        <div class="flex-grid">
-            <select id="month"><option value="spring">3-5月 (春)</option><option value="summer">6-8月 (夏)</option><option value="autumn">9-11月 (秋)</option><option value="winter">12-2月 (冬)</option></select>
-            <div style="text-align:center;"><label><input type="checkbox" id="night"> ナイター</label></div>
-        </div>
-        <div class="flex-grid" style="margin-top:8px;">
-            <select id="windDir"><option value="none">無風</option><option value="oi">追い風</option><option value="mukai">向かい風</option><option value="migiyoko">右横風</option><option value="hidariyoko">左横風</option></select>
-            <input type="number" id="wind" value="0" placeholder="風速">
-        </div>
-        <div style="margin-top:8px; display: flex; gap: 15px; justify-content: center;">
+        <h2>📑 憲法用データ入力 (全7項目)</h2>
+        <textarea id="d1" placeholder="1. 出走表"></textarea>
+        <textarea id="d2" placeholder="2. 節間成績"></textarea>
+        <textarea id="d3" placeholder="3. 枠別勝率"></textarea>
+        <textarea id="d4" placeholder="4. 逃がし率・決まり手"></textarea>
+        <textarea id="d5" placeholder="5. オリジナル展示タイム"></textarea>
+        <textarea id="d6" placeholder="6. スタート展示 (数値コピペで隊形自動判定)"></textarea>
+        <textarea id="rankingData" placeholder="7. モーター・ボートランキング"></textarea>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 5px;">
             <label><input type="checkbox" id="stable"> 安定板</label>
             <label><input type="checkbox" id="lap2"> 2周戦</label>
         </div>
     </div>
-    <div class="section">
-        <h2>📑 憲法用データ入力 (全7項目)</h2>
-        <textarea id="d1" placeholder="1. 出走表"></textarea>
-        <textarea id="d2" placeholder="2. 節間成績 または 直近枠別10走"></textarea>
-        <textarea id="d3" placeholder="3. 枠別勝率 / 平均ST"></textarea>
-        <textarea id="d4" placeholder="4. 枠別決まり手 / 1逃げ率・2逃がし率"></textarea>
-        <textarea id="d5" placeholder="5. オリジナル展示タイム"></textarea>
-        <textarea id="d6" placeholder="6. スタート展示"></textarea>
-        <textarea id="rankingData" placeholder="7. モーター・ボートランキング"></textarea>
-        <h2 style="margin-top:8px;">📉 スリット隊形選択</h2>
-        <select id="slitPattern" style="width:100%;">
-            <option value="none">-- 選択してください --</option>
-            <option value="1">1. 内側先行</option><option value="2">2. 横一線</option><option value="3">3. 1・2先行</option>
-            <option value="4">4. スロー先行</option><option value="5">5. カベなし</option><option value="6">6. 2・3遅れ</option>
-            <option value="7">7. 中凹み</option><option value="8">8. 3の先攻め</option><option value="9">9. 中ぶくれ</option>
-            <option value="10">10. 1遅れ</option><option value="11">11. 外側先行</option><option value="12">12. ダッシュ先行</option>
-            <option value="13">13. バラバラ</option>
-        </select>
-    </div>
     <button class="btn-exec" onclick="executeFinalConstitution()">最 終 分 析 執 行</button>
     <div id="result" class="result-box">
+        <div id="detected-pattern" class="slit-detect"></div>
         <div class="tips-group"><div class="tips-label">🔥 本線 (3連単・絞り)</div><div id="main-tips" class="tips-value"></div></div>
         <div class="tips-group"><div class="tips-label">🎯 抑え (3連単・的中優先)</div><div id="osae-tips" class="tips-value"></div></div>
-        <div id="rank-info" class="rank-log"></div>
     </div>
 </div>
 
@@ -74,13 +52,32 @@ function executeFinalConstitution() {
     const d1 = document.getElementById('d1').value;
     const d4 = document.getElementById('d4').value;
     const d5 = document.getElementById('d5').value;
+    const d6 = document.getElementById('d6').value;
     const rankingText = document.getElementById('rankingData').value;
-    const slit = document.getElementById('slitPattern').value;
     const isStable = document.getElementById('stable').checked;
     const isLap2 = document.getElementById('lap2').checked;
 
-    if (slit === "none") { alert("スリット隊形を選択してください"); return; }
+    // --- スリット自動判定ロジック ---
+    let slitMode = "13"; // デフォルトはバラバラ
+    let slitName = "判定中...";
+    
+    const sts = [];
+    for(let i=1; i<=6; i++) {
+        const m = d6.match(new RegExp(`${i}\\s*\\.\\s*(\\d+)`)) || d6.match(new RegExp(`${i}コース.*?(\\d+)`));
+        sts.push(m ? parseInt(m[1]) : 20);
+    }
+    
+    const avgS = sts.reduce((a,b)=>a+b,0)/6;
+    if(sts[0] < sts[1] - 5 && sts[0] < avgS) { slitMode = "1"; slitName = "内側先行"; }
+    else if(Math.max(...sts) - Math.min(...sts) < 5) { slitMode = "2"; slitName = "横一線"; }
+    else if(sts[0] > 25) { slitMode = "10"; slitName = "1遅れ"; }
+    else if(sts[2] < sts[1] - 10) { slitMode = "5"; slitName = "カベなし(3攻め)"; }
+    else if(sts[3] < sts[2] - 10) { slitMode = "6"; slitName = "2・3遅れ(4カド)"; }
+    else { slitMode = "13"; slitName = "バラバラ"; }
 
+    document.getElementById('detected-pattern').innerText = "判定結果: " + slitName;
+
+    // --- 艇性能・機力解析 ---
     const rateMap = {};
     rankingText.split('\n').forEach(line => {
         const match = line.match(/\|\s*\*\*(\d+)\*\*\s*\|\s*([\d.]+)/);
@@ -89,39 +86,43 @@ function executeFinalConstitution() {
 
     const boats = [];
     for(let i=1; i<=6; i++){
-        const mNum = (d1.match(new RegExp(`${i}号艇[\\s\\S]*?モーター\\s*(\\d+)`)) || [null, null])[1];
-        const straight = (d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`)) || [null, 6.8])[1];
-        const half = (d5.match(new RegExp(`${i}号艇[\\s\\S]*?半周\\s*([\\d.]+)`)) || [null, 18.5])[1];
-        const mRate = rateMap[mNum] || 30.0;
+        const mNumMatch = d1.match(new RegExp(`${i}号艇[\\s\\S]*?モーター\\s*(\\d+)`));
+        const straightMatch = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`));
+        const halfMatch = d5.match(new RegExp(`${i}号艇[\\s\\S]*?半周\\s*([\\d.]+)`));
+        
+        const mRate = rateMap[mNumMatch ? mNumMatch[1] : null] || 30.0;
+        const straight = straightMatch ? parseFloat(straightMatch[1]) : 6.80;
+        const half = halfMatch ? parseFloat(halfMatch[1]) : 18.50;
+        
         let p = mRate;
-        if(isLap2) p += (18.5 - parseFloat(half)) * 10;
-        boats.push({id: i, power: p, straight: parseFloat(straight)});
+        if(isLap2) p += (18.5 - half) * 10;
+        boats.push({id: i, power: p, straight: straight});
     }
 
     const sRank = [...boats].sort((a,b) => a.straight - b.straight);
-    const pRank = [...boats].sort((a,b) => b.power - a.power);
     const nigashi = parseFloat((d4.match(/2号艇[\s\S]*?逃がし率\s*(\d+)/) || [0,45])[1]);
     const isIndefense = (d1.includes("A1") || d1.includes("A2")) && (nigashi >= 40);
 
-    let main = [], osae = [];
+    const getKumi = (r1, r2, r3) => {
+        const f = r1;
+        const s = [r2, r3, 1, 2, 3, 4, 5, 6].find(n => n !== f);
+        const t = [r3, r2, 1, 2, 3, 4, 5, 6].find(n => n !== f && n !== s);
+        return `${f}-${s}-${t}`;
+    };
 
-    if (isIndefense && ["1","2","3","4","7"].includes(slit)) {
+    let main = [], osae = [];
+    if (isIndefense && ["1","2"].includes(slitMode)) {
         const h1 = sRank[0].id === 1 ? sRank[1].id : sRank[0].id;
-        const h2 = sRank[2].id === 1 ? sRank[3].id : sRank[2].id;
-        main = [`1-${h1}-${h2}`, `1-${h1}-2`, `1-${h1}-3`].slice(0,3);
-        osae = [`1-2-3`, `1-3-2`, `1-2-4`].filter(k => !main.includes(k)).slice(0,2);
+        main = [getKumi(1, h1, 2), getKumi(1, h1, 3)];
+        osae = [getKumi(1, 2, 3), getKumi(1, 3, 2)];
     } else {
         const atk = sRank[0].id;
-        const h1 = sRank[1].id;
-        const h2 = sRank[2].id;
-        main = [`${atk}-1-${h1}`, `${atk}-${h1}-1`, `${atk}-1-${h2}`];
-        osae = [`1-${atk}-${h1}`, `${atk}-${h1}-${h2}`];
+        main = [getKumi(atk, 1, sRank[1].id), getKumi(atk, sRank[1].id, 1)];
+        osae = [getKumi(1, atk, sRank[1].id)];
     }
 
-    // 最後に重複除去とフォーマット
-    const clean = (arr) => [...new Set(arr)].filter(v => !v.includes('NaN'));
-    document.getElementById('main-tips').innerText = clean(main).join(' / ');
-    document.getElementById('osae-tips').innerText = clean(osae).join(' / ');
+    document.getElementById('main-tips').innerText = main.join(' / ');
+    document.getElementById('osae-tips').innerText = osae.join(' / ');
     document.getElementById('result').style.display = 'block';
 }
 </script>
