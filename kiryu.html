@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="apple-touch-icon" href="bubuicon.png">
-    <title>桐生・憲法至上命令 (自動執行版)</title>
+    <title>桐生・憲法至上命令 (完全版)</title>
     <style>
         :root { --navy: #001f3f; --gold: #d4af37; --white: #ffffff; --red: #ff4136; --ice: #7fdbff; }
         body { font-family: -apple-system, sans-serif; background: #000; color: var(--white); margin: 0; padding: 10px; }
@@ -39,15 +39,16 @@
     </div>
 
     <div class="section">
-        <h2>📑 憲法用データ入力</h2>
+        <h2>📑 憲法用データ入力 (全7項目)</h2>
         <textarea id="d1" placeholder="1. 出走表 (級別)"></textarea>
         <textarea id="d2" placeholder="2. 節間成績 / 枠別10走"></textarea>
         <textarea id="d4" placeholder="4. 逃がし率・決まり手"></textarea>
         <textarea id="d5" placeholder="5. オリジナル展示タイム"></textarea>
         <textarea id="d6" placeholder="6. スタート展示 (例: 1 .12)"></textarea>
+        <textarea id="d7" placeholder="7. モーター・ボートランキング"></textarea>
     </div>
 
-    <button class="btn-exec" onclick="executeAutoConstitution()">憲 法 執 行 (自動判別)</button>
+    <button class="btn-exec" onclick="executeFullConstitution()">憲 法 執 行</button>
 
     <div id="result" class="result-box">
         <div id="log-text" class="analysis-log"></div>
@@ -57,42 +58,51 @@
 </div>
 
 <script>
-function executeAutoConstitution() {
+function executeFullConstitution() {
     const d1 = document.getElementById('d1').value;
     const d2 = document.getElementById('d2').value;
     const d4 = document.getElementById('d4').value;
     const d5 = document.getElementById('d5').value;
     const d6 = document.getElementById('d6').value;
+    const d7 = document.getElementById('d7').value; // ランキングデータ
+    const isStable = document.getElementById('stable').checked;
 
-    // --- 1. スリット隊形の自動解析 ---
+    // --- 1. スリット自動解析 ---
     const sts = [];
     for(let i=1; i<=6; i++) {
         const m = d6.match(new RegExp(`${i}\\s*\\.\\s*(\\d+)`)) || [0, "15"];
         sts.push(parseInt(m[1]));
     }
     const avgST = sts.reduce((a, b) => a + b, 0) / 6;
-    let slitType = "全員並走";
-    if (sts[0] > avgST + 5) slitType = "内凹み";
-    else if (sts[3] < avgST - 5) slitType = "カデ先行";
-    else if (Math.max(...sts) - Math.min(...sts) > 10) slitType = "バラバラ";
 
-    // --- 2. 1に不安材料はない？ (憲法ステップ1) ---
+    // --- 2. 機力総合スコア計算 (展示タイム + ランキング) ---
+    const boatScores = [];
+    for(let i=1; i<=6; i++) {
+        // 展示タイム (物理的な今の足)
+        const sm = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`)) || [0, "6.85"];
+        const straight = parseFloat(sm[1]);
+        
+        // ランキング補正 (素性)
+        let rankBonus = 0;
+        if (d7.includes(`${i}号艇`) && (d7.includes("S") || d7.includes("A"))) rankBonus = 0.02;
+
+        // 安定板時の外枠リスク
+        let risk = (i >= 5 && isStable) ? 0.05 : 0;
+
+        boatScores.push({ id: i, val: straight - rankBonus + risk });
+    }
+    const bestBoat = boatScores.sort((a,b) => a.val - b.val)[0].id;
+
+    // --- 3. 憲法判定 ---
     const hasBadResult = d2.includes("5") || d2.includes("6") || d2.includes("L") || d2.includes("F");
     const nigashi = parseFloat((d4.match(/2号艇[\s\S]*?逃がし率\s*(\d+)/) || [0,40])[1]);
     const is1Safe = (d1.includes("A1") || d1.includes("A2")) && sts[0] <= avgST && nigashi >= 38 && !hasBadResult;
 
-    // --- 3. 攻め手・恩恵艇の選定 ---
-    const straightTimes = [];
-    for(let i=1; i<=6; i++) {
-        const sm = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`)) || [0, "6.85"];
-        straightTimes.push(parseFloat(sm[1]));
-    }
-    const bestStr = Math.min(...straightTimes);
-    const attacker = straightTimes.indexOf(bestStr) + 1;
+    // --- 4. 展開と買い目 ---
+    const attacker = bestBoat;
     const onkei = (attacker === 1) ? 2 : (attacker === 6 ? 5 : attacker + 1);
-
-    // --- 4. 憲法フローによる買い目生成 ---
     let m = "", o = "", pattern = "";
+
     if (is1Safe) {
         if (attacker >= 4) { pattern = "A (1-4, 1-5)"; m = "1-4-5 / 1-5-4"; o = "1-4-2 / 1-5-2"; }
         else if (attacker === 3) { pattern = "B (1-3)"; m = "1-3-2 / 1-3-4"; o = "1-2-3 / 1-4-3"; }
@@ -104,7 +114,7 @@ function executeAutoConstitution() {
         else { pattern = "F/G (カベなし)"; m = `${head}-${soto}-1 / ${head}-${soto}-全`; o = `${soto}-${head}-1`; }
     }
 
-    document.getElementById('log-text').innerHTML = `自動判別隊形: ${slitType}<br>判定: ${is1Safe ? '1不安なし' : '1不安あり'}<br>憲法分岐: パターン ${pattern}`;
+    document.getElementById('log-text').innerHTML = `判定: ${is1Safe ? '1不安なし' : '1不安あり'}<br>最強機力艇: ${attacker}号艇<br>憲法パターン: ${pattern}`;
     document.getElementById('main-tips').innerText = m;
     document.getElementById('osae-tips').innerText = o;
     document.getElementById('result').style.display = 'block';
