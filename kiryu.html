@@ -13,7 +13,7 @@
         .header h1 { margin: 0; font-size: 20px; color: var(--gold); letter-spacing: 2px; }
         .section { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 15px; border: 1px solid #333; }
         h2 { font-size: 13px; color: var(--gold); margin: 0 0 10px 0; border-bottom: 1px solid var(--gold); display: inline-block; padding-bottom: 3px; }
-        textarea { width: 100%; height: 45px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; padding: 8px; font-size: 12px; box-sizing: border-box; margin-bottom: 8px; }
+        textarea { width: 100%; height: 60px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; padding: 8px; font-size: 12px; box-sizing: border-box; margin-bottom: 8px; }
         input, select { background:#222; border:1px solid #444; color:#fff; padding:8px; border-radius:4px; font-size: 12px;}
         .flex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn-exec { width: 100%; background: linear-gradient(to bottom, #d4af37, #aa841e); color: #000; border: none; padding: 18px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-top: 10px; }
@@ -24,7 +24,6 @@
         .badge { display: inline-block; padding: 3px 7px; font-size: 10px; border-radius: 3px; margin-right: 5px; font-weight: bold; margin-bottom: 5px; }
         .bg-red { background: var(--red); color: #fff; }
         .bg-gold { background: var(--gold); color: #000; }
-        .bg-ice { background: var(--ice); color: #000; }
         .bg-night { background: #111111; border: 1px solid var(--gold); color: var(--gold); }
     </style>
 </head>
@@ -41,19 +40,19 @@
             <div>
                 <label style="font-size:11px;">📅 開催月</label>
                 <select id="month" style="width:100%;">
-                    <option value="winter">12-2月 (冬・赤城おろし)</option>
+                    <option value="winter">12-2月 (冬)</option>
                     <option value="spring">3-5月 (春)</option>
                     <option value="summer">6-8月 (夏)</option>
                     <option value="autumn">9-11月 (秋)</option>
                 </select>
             </div>
             <div style="padding-top:20px;">
-                <label><input type="checkbox" id="night"> ナイター時間帯</label>
+                <label><input type="checkbox" id="night"> ナイター</label>
             </div>
         </div>
         <div class="flex-grid" style="margin-top:10px;">
             <div>
-                <label style="font-size:11px;">🌪 風速・風向き</label>
+                <label style="font-size:11px;">🚩 風向き</label>
                 <select id="windDir" style="width:100%;">
                     <option value="oi">追い風</option>
                     <option value="mukai">向かい風</option>
@@ -73,26 +72,24 @@
     </div>
 
     <div class="section">
-        <h2>📑 憲法用データ入力</h2>
-        <textarea id="d1" placeholder="1. 出走表(級別・選手名)"></textarea>
-        <textarea id="d4" placeholder="4. 逃がし率・決まり手"></textarea>
+        <h2>📑 解析データ入力</h2>
+        <textarea id="d1" placeholder="1. 出走表（ここにモーター・ボート番号を含めて貼る）"></textarea>
+        <textarea id="rankingData" placeholder="【最新ランキング表をここに丸ごとコピペ】" style="height: 100px; border: 1px solid var(--gold);"></textarea>
         <textarea id="d5" placeholder="5. オリジナル展示タイム"></textarea>
-        <div class="flex-grid">
-            <textarea id="motorRank" placeholder="モーター・ボート順位 (例:1,2,5...)"></textarea>
-            <select id="slitPattern" style="width:100%;">
-                <option value="none">-- スリットパターン --</option>
-                <option value="p7">P7. 4カド突出</option>
-                <option value="p10">P10. 1号艇ドカ遅れ</option>
-            </select>
-        </div>
+        <select id="slitPattern" style="width:100%;">
+            <option value="none">-- スリットパターン --</option>
+            <option value="p7">P7. 4カド突出</option>
+            <option value="p10">P10. 1号艇ドカ遅れ</option>
+        </select>
     </div>
 
     <button class="btn-exec" onclick="executeFinalConstitution()">最 終 分 析 執 行</button>
 
     <div id="result" class="result-box">
         <div id="badge-area" style="margin-bottom:10px;"></div>
+        <div id="rank-info" style="font-size:10px; color:#aaa; margin-bottom:10px;"></div>
         <div class="tips-group">
-            <div class="tips-label">🔥 本線 (的中最優先)</div>
+            <div class="tips-label">🔥 本線 (5点以内)</div>
             <div id="main-tips" class="tips-value"></div>
         </div>
         <div class="tips-group">
@@ -104,60 +101,76 @@
 
 <script>
 function executeFinalConstitution() {
-    const isNight = document.getElementById('night').checked;
-    const month = document.getElementById('month').value;
     const isStable = document.getElementById('stable').checked;
     const isLap2 = document.getElementById('lap2').checked;
+    const isNight = document.getElementById('night').checked;
     const wind = parseInt(document.getElementById('wind').value) || 0;
     const windDir = document.getElementById('windDir').value;
     const d1 = document.getElementById('d1').value;
-    const d4 = document.getElementById('d4').value;
+    const rankingText = document.getElementById('rankingData').value;
     const d5 = document.getElementById('d5').value;
 
-    // --- 1. 機力抽出 ---
-    const times = [];
+    // --- 1. ランキング解析 ---
+    const getRank = (text, type) => {
+        const lines = text.split('\n');
+        const map = {};
+        lines.forEach(line => {
+            const match = line.match(/\|\s*\*\*(\d+)\*\*\s*\|\s*([\d.]+)/);
+            if(match) map[match[1]] = parseFloat(match[2]);
+        });
+        return map;
+    };
+    const bRanks = getRank(rankingText);
+    const mRanks = getRank(rankingText);
+
+    // --- 2. 出走艇の機力紐付け ---
+    const boatStats = [];
+    let rankLog = "【抽出された機力】<br>";
     for(let i=1; i<=6; i++){
-        const mS = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`));
-        if(mS) times.push({id: i, straight: parseFloat(mS[1])});
+        const mMatch = d1.match(new RegExp(`${i}号艇[\\s\\S]*?モーター\\s*(\\d+)`)) || d1.match(new RegExp(`${i}[^\\d]*?モーター[^\\d]*?(\\d+)`));
+        const bMatch = d1.match(new RegExp(`${i}号艇[\\s\\S]*?ボート\\s*(\\d+)`)) || d1.match(new RegExp(`${i}[^\\d]*?ボート[^\\d]*?(\\d+)`));
+        const tMatch = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`));
+        
+        const mNum = mMatch ? mMatch[1] : null;
+        const bNum = bMatch ? bMatch[1] : null;
+        const mRate = mRanks[mNum] || 30;
+        const bRate = bRanks[bNum] || 30;
+        const straight = tMatch ? parseFloat(tMatch[1]) : 6.8;
+
+        // 憲法第4条: 安定板時はボート勝率を重視
+        let totalPower = (mRate * 0.6) + (bRate * 0.4);
+        if(isStable) totalPower = (mRate * 0.4) + (bRate * 0.6);
+
+        boatStats.push({id: i, power: totalPower, straight: straight});
+        if(mNum || bNum) rankLog += `${i}号艇: M${mNum}(${mRate}%) B${bNum}(${bRate}%)<br>`;
     }
-    const sRank = [...times].sort((a,b) => a.straight - b.straight);
+    document.getElementById('rank-info').innerHTML = rankLog;
 
-    // --- 2. 憲法判定ロジック ---
-    const is1A = d1.includes("1号艇") && (d1.includes("A1") || d1.includes("A2"));
-    const nigashiMatch = d4.match(/2号艇[\s\S]*?逃がし率\s*(\d+(\.\d+)?)%/);
-    const nigashi = nigashiMatch ? parseFloat(nigashiMatch[1]) : 50;
+    // --- 3. 憲法判定 ---
+    const sRank = [...boatStats].sort((a,b) => a.straight - b.straight);
+    const pRank = [...boatStats].sort((a,b) => b.power - a.power);
+    
+    const is1A = d1.includes("A1") || d1.includes("A2");
+    let isIndefense = is1A;
+    if (windDir === 'oi' && wind >= 5) isIndefense = false; // 冬/荒天特約
 
-    let isIndefense = is1A && (nigashi >= 45 || isNight); // ナイターはインの出足向上を考慮
-
-    // 冬特約: 強い追い風は捲り差しに注意
-    if (month === 'winter' && windDir === 'oi' && wind >= 5) isIndefense = false;
-
-    // --- 3. 買い目構築 ---
+    // --- 4. 買い目 (5点以内) ---
     let main = "", osae = "";
-    const himo = sRank[0].id === 1 ? sRank[1].id : sRank[0].id;
+    const topPowerHimo = pRank[0].id === 1 ? pRank[1].id : pRank[0].id;
+    const topStraightHimo = sRank[0].id === 1 ? sRank[1].id : sRank[0].id;
 
     if (isIndefense) {
-        if (isLap2) {
-            main = `1-${himo}-2, 1-${himo}-3`;
-            osae = `1-3-${himo}, 1-2-${himo}, 1-4-${himo}`;
-        } else {
-            main = `1-2-3, 1-2-4, 1-3-2`;
-            osae = `1-3-4, 1-4-2, 1-4-3`;
-        }
+        main = isStable ? `1-${topPowerHimo}-全なし(5点以内)` : `1-${topStraightHimo}-全なし`;
+        // 具体的な5点
+        main = `1-${topPowerHimo}-2, 1-${topPowerHimo}-3`;
+        osae = `1-2-${topPowerHimo}, 1-3-${topPowerHimo}, 1-4-2`;
     } else {
-        const attacker = sRank[0].id === 1 ? sRank[1].id : sRank[0].id;
-        main = `${attacker}-1-2, ${attacker}-1-3`;
-        osae = `${attacker}-2-1, ${attacker}-3-1, 1-${attacker}-2`;
+        const ana = pRank[0].id;
+        main = `${ana}-1-2, ${ana}-1-3`;
+        osae = `${ana}-2-1, ${ana}-3-1, 1-${ana}-2`;
     }
 
-    // --- 4. 表示表示 ---
-    let badges = "";
-    if (month === 'winter') badges += '<span class="badge bg-ice">冬季(強風注意)</span>';
-    if (isNight) badges += '<span class="badge bg-night">NIGHTER</span>';
-    if (isStable) badges += '<span class="badge bg-red">安定板</span>';
-    if (isLap2) badges += '<span class="badge bg-blue">2周戦</span>';
-    
-    document.getElementById('badge-area').innerHTML = badges;
+    // --- 5. 表示 ---
     document.getElementById('main-tips').innerText = main;
     document.getElementById('osae-tips').innerText = osae;
     document.getElementById('result').style.display = 'block';
