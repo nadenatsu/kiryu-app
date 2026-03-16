@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="apple-touch-icon" href="bubuicon.png">
-    <title>桐生・憲法執行アプリ</title>
+    <title>桐生・至上命令執行アプリ</title>
     <style>
         :root { --navy: #001f3f; --gold: #d4af37; --white: #ffffff; --red: #ff4136; --ice: #7fdbff; }
         body { font-family: -apple-system, sans-serif; background: #000; color: var(--white); margin: 0; padding: 15px; }
         .container { max-width: 500px; margin: 0 auto; }
         .header { text-align: center; border: 2px solid var(--gold); padding: 10px; margin-bottom: 20px; background: var(--navy); border-radius: 8px; }
-        .header h1 { margin: 0; font-size: 20px; color: var(--gold); letter-spacing: 2px; }
+        .header h1 { margin: 0; font-size: 18px; color: var(--gold); letter-spacing: 2px; }
         .section { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 15px; border: 1px solid #333; }
         h2 { font-size: 13px; color: var(--gold); margin: 0 0 10px 0; border-bottom: 1px solid var(--gold); display: inline-block; padding-bottom: 3px; }
         textarea { width: 100%; height: 60px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; padding: 8px; font-size: 12px; box-sizing: border-box; margin-bottom: 8px; }
@@ -25,13 +25,14 @@
         .bg-red { background: var(--red); color: #fff; }
         .bg-gold { background: var(--gold); color: #000; }
         .bg-night { background: #111111; border: 1px solid var(--gold); color: var(--gold); }
+        .rank-log { font-size: 11px; color: #aaa; line-height: 1.4; border-top: 1px solid #333; padding-top: 5px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>🔱 桐生・予想執行憲法 🔱</h1>
+        <h1>🔱 桐生・至上命令執行 🔱</h1>
     </div>
 
     <div class="section">
@@ -40,7 +41,7 @@
             <div>
                 <label style="font-size:11px;">📅 開催月</label>
                 <select id="month" style="width:100%;">
-                    <option value="winter">12-2月 (冬)</option>
+                    <option value="winter">12-2月 (冬・赤城おろし)</option>
                     <option value="spring">3-5月 (春)</option>
                     <option value="summer">6-8月 (夏)</option>
                     <option value="autumn">9-11月 (秋)</option>
@@ -72,10 +73,10 @@
     </div>
 
     <div class="section">
-        <h2>📑 解析データ入力</h2>
-        <textarea id="d1" placeholder="1. 出走表（ここにモーター・ボート番号を含めて貼る）"></textarea>
-        <textarea id="rankingData" placeholder="【最新ランキング表をここに丸ごとコピペ】" style="height: 100px; border: 1px solid var(--gold);"></textarea>
-        <textarea id="d5" placeholder="5. オリジナル展示タイム"></textarea>
+        <h2>📑 憲法用データ入力</h2>
+        <textarea id="d1" placeholder="1. 出走表（例: 1号艇 A1 モーター30 ボート61）"></textarea>
+        <textarea id="rankingData" placeholder="【最新ランキング表をここに丸ごと貼り付け】" style="height: 100px; border: 1px solid var(--gold);"></textarea>
+        <textarea id="d5" placeholder="5. オリジナル展示タイム（直線、半周など）"></textarea>
         <select id="slitPattern" style="width:100%;">
             <option value="none">-- スリットパターン --</option>
             <option value="p7">P7. 4カド突出</option>
@@ -83,94 +84,100 @@
         </select>
     </div>
 
-    <button class="btn-exec" onclick="executeFinalConstitution()">最 終 分 析 執 行</button>
+    <button class="btn-exec" onclick="executeConstitution()">最 終 分 析 執 行</button>
 
     <div id="result" class="result-box">
-        <div id="badge-area" style="margin-bottom:10px;"></div>
-        <div id="rank-info" style="font-size:10px; color:#aaa; margin-bottom:10px;"></div>
+        <div id="badge-area"></div>
         <div class="tips-group">
-            <div class="tips-label">🔥 本線 (5点以内)</div>
+            <div class="tips-label">🔥 本線 (的中最優先・5点以内)</div>
             <div id="main-tips" class="tips-value"></div>
         </div>
         <div class="tips-group">
-            <div class="tips-label">🎯 抑え</div>
+            <div class="tips-label">🎯 抑え (期待値補完)</div>
             <div id="osae-tips" class="tips-value" style="font-size:18px;"></div>
         </div>
+        <div id="rank-info" class="rank-log"></div>
     </div>
 </div>
 
 <script>
-function executeFinalConstitution() {
-    const isStable = document.getElementById('stable').checked;
-    const isLap2 = document.getElementById('lap2').checked;
-    const isNight = document.getElementById('night').checked;
-    const wind = parseInt(document.getElementById('wind').value) || 0;
-    const windDir = document.getElementById('windDir').value;
+function executeConstitution() {
     const d1 = document.getElementById('d1').value;
     const rankingText = document.getElementById('rankingData').value;
     const d5 = document.getElementById('d5').value;
+    const isStable = document.getElementById('stable').checked;
+    const isLap2 = document.getElementById('lap2').checked;
+    const isNight = document.getElementById('night').checked;
+    const month = document.getElementById('month').value;
+    const wind = parseInt(document.getElementById('wind').value) || 0;
+    const windDir = document.getElementById('windDir').value;
 
-    // --- 1. ランキング解析 ---
-    const getRank = (text, type) => {
+    // --- 1. ランキング表からデータを抽出 ---
+    const parseRanking = (text) => {
         const lines = text.split('\n');
-        const map = {};
+        const data = {};
         lines.forEach(line => {
             const match = line.match(/\|\s*\*\*(\d+)\*\*\s*\|\s*([\d.]+)/);
-            if(match) map[match[1]] = parseFloat(match[2]);
+            if(match) data[match[1]] = parseFloat(match[2]);
         });
-        return map;
+        return data;
     };
-    const bRanks = getRank(rankingText);
-    const mRanks = getRank(rankingText);
+    const rateMap = parseRanking(rankingText);
 
-    // --- 2. 出走艇の機力紐付け ---
-    const boatStats = [];
-    let rankLog = "【抽出された機力】<br>";
+    // --- 2. 出走艇ごとの機力紐付け ---
+    const boats = [];
+    let logText = "【機力解析結果】<br>";
     for(let i=1; i<=6; i++){
-        const mMatch = d1.match(new RegExp(`${i}号艇[\\s\\S]*?モーター\\s*(\\d+)`)) || d1.match(new RegExp(`${i}[^\\d]*?モーター[^\\d]*?(\\d+)`));
-        const bMatch = d1.match(new RegExp(`${i}号艇[\\s\\S]*?ボート\\s*(\\d+)`)) || d1.match(new RegExp(`${i}[^\\d]*?ボート[^\\d]*?(\\d+)`));
-        const tMatch = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`));
+        const mNum = (d1.match(new RegExp(`${i}号艇[\\s\\S]*?モーター\\s*(\\d+)`)) || d1.match(new RegExp(`${i}[^\\d]*?モーター[^\\d]*?(\\d+)`)) || [null, null])[1];
+        const bNum = (d1.match(new RegExp(`${i}号艇[\\s\\S]*?ボート\\s*(\\d+)`)) || d1.match(new RegExp(`${i}[^\\d]*?ボート[^\\d]*?(\\d+)`)) || [null, null])[1];
+        const straightTime = (d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`)) || [null, 6.8])[1];
         
-        const mNum = mMatch ? mMatch[1] : null;
-        const bNum = bMatch ? bMatch[1] : null;
-        const mRate = mRanks[mNum] || 30;
-        const bRate = bRanks[bNum] || 30;
-        const straight = tMatch ? parseFloat(tMatch[1]) : 6.8;
-
+        const mRate = rateMap[mNum] || 30.0;
+        const bRate = rateMap[bNum] || 30.0;
+        
         // 憲法第4条: 安定板時はボート勝率を重視
-        let totalPower = (mRate * 0.6) + (bRate * 0.4);
-        if(isStable) totalPower = (mRate * 0.4) + (bRate * 0.6);
+        let powerScore = (mRate * 0.6) + (bRate * 0.4);
+        if(isStable) powerScore = (mRate * 0.4) + (bRate * 0.6);
 
-        boatStats.push({id: i, power: totalPower, straight: straight});
-        if(mNum || bNum) rankLog += `${i}号艇: M${mNum}(${mRate}%) B${bNum}(${bRate}%)<br>`;
+        boats.push({id: i, power: powerScore, straight: parseFloat(straightTime)});
+        logText += `${i}号艇: M${mNum||'?'}(${mRate}%) B${bNum||'?'}(${bRate}%) 直線:${straightTime}<br>`;
     }
-    document.getElementById('rank-info').innerHTML = rankLog;
+    document.getElementById('rank-info').innerHTML = logText;
 
-    // --- 3. 憲法判定 ---
-    const sRank = [...boatStats].sort((a,b) => a.straight - b.straight);
-    const pRank = [...boatStats].sort((a,b) => b.power - a.power);
-    
+    // --- 3. 憲法判定ロジック ---
+    const sRank = [...boats].sort((a,b) => a.straight - b.straight); // 直線タイム順
+    const pRank = [...boats].sort((a,b) => b.power - a.power);    // 機力勝率順
+
     const is1A = d1.includes("A1") || d1.includes("A2");
     let isIndefense = is1A;
-    if (windDir === 'oi' && wind >= 5) isIndefense = false; // 冬/荒天特約
+    if (month === 'winter' && windDir === 'oi' && wind >= 5) isIndefense = false; 
 
-    // --- 4. 買い目 (5点以内) ---
+    // --- 4. 買い目構築 (5点以内厳守) ---
     let main = "", osae = "";
-    const topPowerHimo = pRank[0].id === 1 ? pRank[1].id : pRank[0].id;
-    const topStraightHimo = sRank[0].id === 1 ? sRank[1].id : sRank[0].id;
+    const himo1 = sRank[0].id === 1 ? sRank[1].id : sRank[0].id;
+    const himo2 = pRank[0].id === 1 ? pRank[1].id : pRank[0].id;
 
     if (isIndefense) {
-        main = isStable ? `1-${topPowerHimo}-全なし(5点以内)` : `1-${topStraightHimo}-全なし`;
-        // 具体的な5点
-        main = `1-${topPowerHimo}-2, 1-${topPowerHimo}-3`;
-        osae = `1-2-${topPowerHimo}, 1-3-${topPowerHimo}, 1-4-2`;
+        if (isLap2) {
+            main = `1-${himo1}-2, 1-${himo1}-3`;
+            osae = `1-2-${himo1}, 1-3-${himo1}, 1-4-${himo1}`;
+        } else {
+            main = `1-2-3, 1-2-4, 1-3-2`;
+            osae = `1-3-4, 1-4-2, 1-4-3`;
+        }
     } else {
-        const ana = pRank[0].id;
-        main = `${ana}-1-2, ${ana}-1-3`;
-        osae = `${ana}-2-1, ${ana}-3-1, 1-${ana}-2`;
+        const attacker = sRank[0].id;
+        main = `${attacker}-1-2, ${attacker}-1-3`;
+        osae = `${attacker}-2-1, ${attacker}-3-1, 1-${attacker}-2`;
     }
 
     // --- 5. 表示 ---
+    let badges = "";
+    if (isNight) badges += '<span class="badge bg-night">NIGHTER</span>';
+    if (isStable) badges += '<span class="badge bg-red">安定板</span>';
+    if (isLap2) badges += '<span class="badge bg-ice" style="color:#000">2周戦</span>';
+    
+    document.getElementById('badge-area').innerHTML = badges;
     document.getElementById('main-tips').innerText = main;
     document.getElementById('osae-tips').innerText = osae;
     document.getElementById('result').style.display = 'block';
