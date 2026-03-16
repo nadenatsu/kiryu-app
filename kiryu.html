@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="apple-touch-icon" href="bubuicon.png">
-    <title>桐生・憲法至上命令 (完全版)</title>
+    <title>桐生・憲法至上命令 (真・完全版)</title>
     <style>
         :root { --navy: #001f3f; --gold: #d4af37; --white: #ffffff; --red: #ff4136; --ice: #7fdbff; }
         body { font-family: -apple-system, sans-serif; background: #000; color: var(--white); margin: 0; padding: 10px; }
@@ -14,7 +14,8 @@
         .section { background: #1a1a1a; border-radius: 8px; padding: 10px; margin-bottom: 10px; border: 1px solid #333; }
         h2 { font-size: 11px; color: var(--gold); margin: 0 0 8px 0; border-bottom: 1px solid var(--gold); display: inline-block; padding-bottom: 2px; }
         textarea { width: 100%; height: 45px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; padding: 6px; font-size: 11px; box-sizing: border-box; margin-bottom: 8px; }
-        .flex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        select, input[type="number"] { background:#222; color:#fff; border:1px solid #444; padding:8px; border-radius:4px; font-size: 12px; }
+        .flex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
         .btn-exec { width: 100%; background: linear-gradient(to bottom, #d4af37, #aa841e); color: #000; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; }
         .result-box { background: var(--navy); border: 2px solid var(--gold); padding: 15px; margin-top: 15px; border-radius: 8px; display: none; }
         .tips-group { margin-bottom: 10px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; }
@@ -28,9 +29,25 @@
     <div class="header"><h1>🔱 桐生・憲法至上命令 🔱</h1></div>
 
     <div class="section">
-        <div class="flex-grid" style="margin-bottom:8px;">
-            <select id="month" style="background:#222; color:#fff; border:1px solid #444; padding:5px;"><option value="autumn">3-11月</option><option value="winter">12-2月</option></select>
-            <select id="time" style="background:#222; color:#fff; border:1px solid #444; padding:5px;"><option value="night">夜</option><option value="day">昼</option></select>
+        <h2>🌡️ 環境条件</h2>
+        <div class="flex-grid">
+            <select id="month">
+                <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+                <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+                <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+                <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+            </select>
+            <select id="time">
+                <option value="morning">朝</option><option value="noon">昼</option>
+                <option value="evening">夕方</option><option value="night" selected>夜</option>
+            </select>
+        </div>
+        <div class="flex-grid">
+            <select id="windDir">
+                <option value="none">無風</option><option value="follow">追い風</option>
+                <option value="against">向かい風</option><option value="cross">横風</option>
+            </select>
+            <input type="number" id="windSpeed" placeholder="風速(m)" min="0" step="1" value="0">
         </div>
         <div style="display:flex; justify-content:center; gap:20px; font-size:12px;">
             <label><input type="checkbox" id="stable"> 安定板</label>
@@ -40,7 +57,7 @@
 
     <div class="section">
         <h2>📑 憲法用データ入力 (全7項目)</h2>
-        <textarea id="d1" placeholder="1. 出走表 (級別)"></textarea>
+        <textarea id="d1" placeholder="1. 出走表 (級別・選手名)"></textarea>
         <textarea id="d2" placeholder="2. 節間成績 / 枠別10走"></textarea>
         <textarea id="d4" placeholder="4. 逃がし率・決まり手"></textarea>
         <textarea id="d5" placeholder="5. オリジナル展示タイム"></textarea>
@@ -48,7 +65,7 @@
         <textarea id="d7" placeholder="7. モーター・ボートランキング"></textarea>
     </div>
 
-    <button class="btn-exec" onclick="executeFullConstitution()">憲 法 執 行</button>
+    <button class="btn-exec" onclick="executeShinConstitution()">憲 法 執 行</button>
 
     <div id="result" class="result-box">
         <div id="log-text" class="analysis-log"></div>
@@ -58,14 +75,19 @@
 </div>
 
 <script>
-function executeFullConstitution() {
+function executeShinConstitution() {
+    const month = parseInt(document.getElementById('month').value);
+    const windDir = document.getElementById('windDir').value;
+    const windSpeed = parseInt(document.getElementById('windSpeed').value);
+    const isStable = document.getElementById('stable').checked;
+    const isLap2 = document.getElementById('lap2').checked;
+
     const d1 = document.getElementById('d1').value;
     const d2 = document.getElementById('d2').value;
     const d4 = document.getElementById('d4').value;
     const d5 = document.getElementById('d5').value;
     const d6 = document.getElementById('d6').value;
-    const d7 = document.getElementById('d7').value; // ランキングデータ
-    const isStable = document.getElementById('stable').checked;
+    const d7 = document.getElementById('d7').value;
 
     // --- 1. スリット自動解析 ---
     const sts = [];
@@ -75,34 +97,31 @@ function executeFullConstitution() {
     }
     const avgST = sts.reduce((a, b) => a + b, 0) / 6;
 
-    // --- 2. 機力総合スコア計算 (展示タイム + ランキング) ---
-    const boatScores = [];
+    // --- 2. 機力評価 (月・風・安定板・ランキングを加味) ---
+    const scores = [];
     for(let i=1; i<=6; i++) {
-        // 展示タイム (物理的な今の足)
         const sm = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`)) || [0, "6.85"];
-        const straight = parseFloat(sm[1]);
+        let s = parseFloat(sm[1]);
         
-        // ランキング補正 (素性)
-        let rankBonus = 0;
-        if (d7.includes(`${i}号艇`) && (d7.includes("S") || d7.includes("A"))) rankBonus = 0.02;
-
-        // 安定板時の外枠リスク
-        let risk = (i >= 5 && isStable) ? 0.05 : 0;
-
-        boatScores.push({ id: i, val: straight - rankBonus + risk });
+        // 冬の赤城おろし補正
+        if ((month <= 2 || month === 12) && i === 1) s -= 0.01;
+        // 追い風時のイン有利
+        if (windDir === 'follow' && windSpeed >= 3 && i === 1) s -= 0.01;
+        // 安定板/2周戦時の機力補正
+        if (isStable && isLap2) {
+            if (d7.includes(`${i}号艇`) && (d7.includes("S") || d7.includes("A"))) s -= 0.02;
+            if (i >= 5) s += 0.03; // 外枠リスク
+        }
+        scores.push({ id: i, val: s });
     }
-    const bestBoat = boatScores.sort((a,b) => a.val - b.val)[0].id;
+    const attacker = scores.sort((a,b) => a.val - b.val)[0].id;
 
-    // --- 3. 憲法判定 ---
-    const hasBadResult = d2.includes("5") || d2.includes("6") || d2.includes("L") || d2.includes("F");
+    // --- 3. 憲法判定フロー ---
+    const hasBad = d2.includes("5") || d2.includes("6") || d2.includes("F");
     const nigashi = parseFloat((d4.match(/2号艇[\s\S]*?逃がし率\s*(\d+)/) || [0,40])[1]);
-    const is1Safe = (d1.includes("A1") || d1.includes("A2")) && sts[0] <= avgST && nigashi >= 38 && !hasBadResult;
+    const is1Safe = (d1.includes("A1") || d1.includes("A2")) && sts[0] <= avgST && nigashi >= 38 && !hasBad;
 
-    // --- 4. 展開と買い目 ---
-    const attacker = bestBoat;
-    const onkei = (attacker === 1) ? 2 : (attacker === 6 ? 5 : attacker + 1);
     let m = "", o = "", pattern = "";
-
     if (is1Safe) {
         if (attacker >= 4) { pattern = "A (1-4, 1-5)"; m = "1-4-5 / 1-5-4"; o = "1-4-2 / 1-5-2"; }
         else if (attacker === 3) { pattern = "B (1-3)"; m = "1-3-2 / 1-3-4"; o = "1-2-3 / 1-4-3"; }
@@ -114,7 +133,7 @@ function executeFullConstitution() {
         else { pattern = "F/G (カベなし)"; m = `${head}-${soto}-1 / ${head}-${soto}-全`; o = `${soto}-${head}-1`; }
     }
 
-    document.getElementById('log-text').innerHTML = `判定: ${is1Safe ? '1不安なし' : '1不安あり'}<br>最強機力艇: ${attacker}号艇<br>憲法パターン: ${pattern}`;
+    document.getElementById('log-text').innerHTML = `環境: ${month}月・${windDir}${windSpeed}m<br>判定: ${is1Safe ? '1不安なし' : '1不安あり'}<br>最強機力艇: ${attacker}号艇`;
     document.getElementById('main-tips').innerText = m;
     document.getElementById('osae-tips').innerText = o;
     document.getElementById('result').style.display = 'block';
