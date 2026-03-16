@@ -4,33 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="apple-touch-icon" href="bubuicon.png">
-    <title>桐生・至上命令執行アプリ</title>
+    <title>桐生・憲法執行アプリ</title>
     <style>
-        :root { --navy: #001f3f; --gold: #d4af37; --white: #ffffff; --red: #ff4136; }
+        :root { --navy: #001f3f; --gold: #d4af37; --white: #ffffff; --red: #ff4136; --ice: #7fdbff; }
         body { font-family: -apple-system, sans-serif; background: #000; color: var(--white); margin: 0; padding: 15px; }
         .container { max-width: 500px; margin: 0 auto; }
         .header { text-align: center; border: 2px solid var(--gold); padding: 10px; margin-bottom: 20px; background: var(--navy); border-radius: 8px; }
         .header h1 { margin: 0; font-size: 20px; color: var(--gold); letter-spacing: 2px; }
-        
         .section { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 15px; border: 1px solid #333; }
         h2 { font-size: 13px; color: var(--gold); margin: 0 0 10px 0; border-bottom: 1px solid var(--gold); display: inline-block; padding-bottom: 3px; }
-        
-        textarea { width: 100%; height: 50px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; padding: 8px; font-size: 12px; box-sizing: border-box; margin-bottom: 8px; }
-        textarea:focus { border-color: var(--gold); outline: none; }
-
+        textarea { width: 100%; height: 45px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; padding: 8px; font-size: 12px; box-sizing: border-box; margin-bottom: 8px; }
         input, select { background:#222; border:1px solid #444; color:#fff; padding:8px; border-radius:4px; font-size: 12px;}
-
         .flex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        .btn-exec { width: 100%; background: linear-gradient(to bottom, #d4af37, #aa841e); color: #000; border: none; padding: 18px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-top: 10px; text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
-        
-        .result-box { background: var(--navy); border: 2px solid var(--gold); padding: 15px; margin-top: 20px; border-radius: 8px; display: none; line-height: 1.6; }
-        .result-title { color: var(--gold); font-weight: bold; border-bottom: 1px solid var(--gold); margin-bottom: 10px; padding-bottom: 5px; text-align: center; }
-        .tips-area { font-size: 26px; color: #fff; text-align: center; margin: 15px 0; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 4px; border: 1px dashed var(--gold); }
-        .badge { display: inline-block; padding: 3px 7px; font-size: 11px; border-radius: 3px; margin-right: 5px; font-weight: bold; }
+        .btn-exec { width: 100%; background: linear-gradient(to bottom, #d4af37, #aa841e); color: #000; border: none; padding: 18px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-top: 10px; }
+        .result-box { background: var(--navy); border: 2px solid var(--gold); padding: 15px; margin-top: 20px; border-radius: 8px; display: none; }
+        .tips-group { margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 4px; }
+        .tips-label { font-size: 11px; color: var(--gold); font-weight: bold; margin-bottom: 3px; }
+        .tips-value { font-size: 24px; color: #fff; text-align: center; font-weight: bold; }
+        .badge { display: inline-block; padding: 3px 7px; font-size: 10px; border-radius: 3px; margin-right: 5px; font-weight: bold; margin-bottom: 5px; }
         .bg-red { background: var(--red); color: #fff; }
         .bg-gold { background: var(--gold); color: #000; }
-        .logic-log { font-size:12px; color:#ddd; margin-bottom:10px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px;}
+        .bg-ice { background: var(--ice); color: #000; }
+        .bg-night { background: #111111; border: 1px solid var(--gold); color: var(--gold); }
     </style>
 </head>
 <body>
@@ -38,151 +33,133 @@
 <div class="container">
     <div class="header">
         <h1>🔱 桐生・予想執行憲法 🔱</h1>
-        <div style="font-size: 10px; color: #ccc; margin-top: 5px;">的中最優先・例外なき物理分析（全9条準拠）</div>
     </div>
 
     <div class="section">
         <h2>環境・特殊条件</h2>
         <div class="flex-grid">
             <div>
+                <label style="font-size:11px;">📅 開催月</label>
+                <select id="month" style="width:100%;">
+                    <option value="winter">12-2月 (冬・赤城おろし)</option>
+                    <option value="spring">3-5月 (春)</option>
+                    <option value="summer">6-8月 (夏)</option>
+                    <option value="autumn">9-11月 (秋)</option>
+                </select>
+            </div>
+            <div style="padding-top:20px;">
+                <label><input type="checkbox" id="night"> ナイター時間帯</label>
+            </div>
+        </div>
+        <div class="flex-grid" style="margin-top:10px;">
+            <div>
+                <label style="font-size:11px;">🌪 風速・風向き</label>
+                <select id="windDir" style="width:100%;">
+                    <option value="oi">追い風</option>
+                    <option value="mukai">向かい風</option>
+                    <option value="migiyoko">右横風</option>
+                    <option value="hidariyoko">左横風</option>
+                </select>
+            </div>
+            <div>
                 <label style="font-size:11px;">🌪 風速(m)</label>
                 <input type="number" id="wind" value="0" style="width:100%;">
             </div>
-            <div style="padding-top:20px;">
-                <input type="checkbox" id="stable"> <span style="font-size:11px;">安定板・2周戦(第4条特約)</span>
-            </div>
+        </div>
+        <div style="margin-top:10px; display: flex; gap: 15px; justify-content: center;">
+            <label><input type="checkbox" id="stable"> 安定板</label>
+            <label><input type="checkbox" id="lap2"> 2周戦</label>
         </div>
     </div>
 
     <div class="section">
         <h2>📑 憲法用データ入力</h2>
-        <textarea id="d1" placeholder="1. 出走表(級別・名前)"></textarea>
-        <textarea id="d3" placeholder="3. 枠別勝率・平均ST"></textarea>
+        <textarea id="d1" placeholder="1. 出走表(級別・選手名)"></textarea>
         <textarea id="d4" placeholder="4. 逃がし率・決まり手"></textarea>
-        <textarea id="d5" placeholder="5. オリジナル展示(直線・半周・回り足)"></textarea>
-        <textarea id="d6" placeholder="6. スタート展示(スリット数値)"></textarea>
-        
-        <h2>スタート展示・スリット隊形(選択)</h2>
-        <select id="slitPattern" style="width:100%;">
-            <option value="none">-- スリットパターン(第9条)を選択 --</option>
-            <option value="p1">P1. 完全フラット（コース利）</option>
-            <option value="p3">P3. 1・2先行（1-2重視）</option>
-            <option value="p7">P7. 4カド突出（4-56）</option>
-            <option value="p9">P9. 中ぶくれ:3・4突出（飲み込み波乱）</option>
-            <option value="p10">P10. 1イン遅れ（波乱）</option>
-            <option value="p11">P11. 外(5・6)先行（外格上特約）</option>
-            <option value="p12">P12. ダッシュ総捲り（大波乱）</option>
-        </select>
+        <textarea id="d5" placeholder="5. オリジナル展示タイム"></textarea>
+        <div class="flex-grid">
+            <textarea id="motorRank" placeholder="モーター・ボート順位 (例:1,2,5...)"></textarea>
+            <select id="slitPattern" style="width:100%;">
+                <option value="none">-- スリットパターン --</option>
+                <option value="p7">P7. 4カド突出</option>
+                <option value="p10">P10. 1号艇ドカ遅れ</option>
+            </select>
+        </div>
     </div>
 
     <button class="btn-exec" onclick="executeFinalConstitution()">最 終 分 析 執 行</button>
 
     <div id="result" class="result-box">
-        <div id="badge-area"></div>
-        <div class="result-title">🔱 判決・推奨買い目 🔱</div>
-        <div id="logic-path" class="logic-log"></div>
-        <div class="tips-area" id="final-tips"></div>
-        <div id="osae" style="font-size:13px; border-top:1px dashed #666; padding-top:10px; color:#ccc;"></div>
+        <div id="badge-area" style="margin-bottom:10px;"></div>
+        <div class="tips-group">
+            <div class="tips-label">🔥 本線 (的中最優先)</div>
+            <div id="main-tips" class="tips-value"></div>
+        </div>
+        <div class="tips-group">
+            <div class="tips-label">🎯 抑え</div>
+            <div id="osae-tips" class="tips-value" style="font-size:18px;"></div>
+        </div>
     </div>
 </div>
 
 <script>
 function executeFinalConstitution() {
+    const isNight = document.getElementById('night').checked;
+    const month = document.getElementById('month').value;
     const isStable = document.getElementById('stable').checked;
+    const isLap2 = document.getElementById('lap2').checked;
     const wind = parseInt(document.getElementById('wind').value) || 0;
-    const slit = document.getElementById('slitPattern').value;
+    const windDir = document.getElementById('windDir').value;
     const d1 = document.getElementById('d1').value;
-    const d3 = document.getElementById('d3').value;
     const d4 = document.getElementById('d4').value;
     const d5 = document.getElementById('d5').value;
 
-    let log = "【憲法第7条フロー判定】\n";
-    let isModeB = wind >= 7; // 第5条
-    
-    // --- 1. 機力抽出 (第5条) ---
+    // --- 1. 機力抽出 ---
     const times = [];
     for(let i=1; i<=6; i++){
         const mS = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`));
-        const mH = d5.match(new RegExp(`${i}号艇[\\s\\S]*?半周\\s*([\\d.]+)`));
-        if(mS && mH) times.push({id: i, straight: parseFloat(mS[1]), half: parseFloat(mH[1])});
+        if(mS) times.push({id: i, straight: parseFloat(mS[1])});
     }
     const sRank = [...times].sort((a,b) => a.straight - b.straight);
-    const hRank = [...times].sort((a,b) => a.half - b.half);
 
-    // --- 2. 各特約・黄金比チェック ---
+    // --- 2. 憲法判定ロジック ---
     const is1A = d1.includes("1号艇") && (d1.includes("A1") || d1.includes("A2"));
-    
-    // 逃がし率 (第2条・第8条)
     const nigashiMatch = d4.match(/2号艇[\s\S]*?逃がし率\s*(\d+(\.\d+)?)%/);
-    const nigashiRate = nigashiMatch ? parseFloat(nigashiMatch[1]) : 50;
-    let stableNigashiOk = nigashiRate >= 70;
-    let normalNigashiOk = nigashiRate >= 60;
-    
-    // 平均ST (第7条)
-    const avgStMatch = d3.match(/1号艇[\s\S]*?平均ST\s*(\d+(\.\d+)?)?/);
-    const avgSt1 = avgStMatch ? parseFloat(avgStMatch[1]) : 0.15;
-    
-    // --- 3. ステップ判定 (第2条・第7条) ---
-    let step1 = "Yes (不安なし)";
-    let reason1 = "基本の逃げ優先（第2条）";
-    let is聖域 = false;
+    const nigashi = nigashiMatch ? parseFloat(nigashiMatch[1]) : 50;
 
-    // 不安あり(No)判定
-    if(!is1A) step1 = "No (B級イン)";
-    if(stableNigashiOk === false && isStable) step1 = "No (安定板壁薄)";
-    
-    // 例外規定による強制Yes
-    if(avgSt1 <= 0.15 && is1A && sRank[0].id === 1) {
-        step1 = "Yes (A級+平均ST+直線1位)";
-        is聖域 = true;
-    }
-    
-    // 物理的壁消失 (絶対命令)
-    if(avgSt1 >= 0.18 && nigashiRate <= 35) {
-        step1 = "No (物理的壁消失特約発動)";
-        is聖域 = false;
-    }
+    let isIndefense = is1A && (nigashi >= 45 || isNight); // ナイターはインの出足向上を考慮
 
-    log += `・イン判定: ${step1}\n`;
-    if(is聖域) log += `⚠️ 第2条「聖域」認定 (逃げ固定)\n`;
+    // 冬特約: 強い追い風は捲り差しに注意
+    if (month === 'winter' && windDir === 'oi' && wind >= 5) isIndefense = false;
 
-    // --- 4. 展開・買い目構築 (第8条・第9条) ---
-    let tips = "";
-    let osae = "";
-    let mainAx = step1.includes("Yes") ? 1 : sRank[0].id;
-    let topHimo = times.find(t => t.id === mainAx);
-    
-    // スリット上書き (第9条)
-    if (slit === "p7" || slit === "p12") {
-        tips = `4-5, 4-6`;
-        osae = `🎯 ダッシュ突出捲り (スリット優先特約)`;
-    } else if (slit === "p9") {
-        tips = `3-4, 3-5`;
-        osae = `🎯 中ぶくれ飲み込み (5・6連動優先)`;
-    } else if (mainAx === 1) {
-        // イン逃げ
-        const himo = sRank[0].id === 1 ? sRank[1].id : sRank[0].id;
-        if(isStable){
-            tips = `1-${himo}, 1-3`; // 安定板は直線1位優先
-            osae = `🎯 抑え: 1-${himo}-全`;
+    // --- 3. 買い目構築 ---
+    let main = "", osae = "";
+    const himo = sRank[0].id === 1 ? sRank[1].id : sRank[0].id;
+
+    if (isIndefense) {
+        if (isLap2) {
+            main = `1-${himo}-2, 1-${himo}-3`;
+            osae = `1-3-${himo}, 1-2-${himo}, 1-4-${himo}`;
         } else {
-            tips = `1-2-34, 1-3-24`; // 通常は壁＆4特約
-            osae = `🎯 抑え: 1-4-全 (桐生4コース特約)`;
+            main = `1-2-3, 1-2-4, 1-3-2`;
+            osae = `1-3-4, 1-4-2, 1-4-3`;
         }
     } else {
-        // 波乱
-        tips = `${mainAx}-全-全`;
-        osae = `🎯 穴: 直線最上位からの全`;
+        const attacker = sRank[0].id === 1 ? sRank[1].id : sRank[0].id;
+        main = `${attacker}-1-2, ${attacker}-1-3`;
+        osae = `${attacker}-2-1, ${attacker}-3-1, 1-${attacker}-2`;
     }
 
-    // --- 5. 出力表示 ---
-    let badgeHtml = `<span class="badge bg-gold">MODE ${isModeB ? 'B荒天' : 'A凪'}</span>`;
-    if (isStable) badgeHtml += '<span class="badge bg-red">安定板・2周戦</span>';
+    // --- 4. 表示表示 ---
+    let badges = "";
+    if (month === 'winter') badges += '<span class="badge bg-ice">冬季(強風注意)</span>';
+    if (isNight) badges += '<span class="badge bg-night">NIGHTER</span>';
+    if (isStable) badges += '<span class="badge bg-red">安定板</span>';
+    if (isLap2) badges += '<span class="badge bg-blue">2周戦</span>';
     
-    document.getElementById('badge-area').innerHTML = badgeHtml;
-    document.getElementById('logic-path').innerText = log;
-    document.getElementById('final-tips').innerText = tips;
-    document.getElementById('osae').innerText = osae;
+    document.getElementById('badge-area').innerHTML = badges;
+    document.getElementById('main-tips').innerText = main;
+    document.getElementById('osae-tips').innerText = osae;
     document.getElementById('result').style.display = 'block';
 }
 </script>
