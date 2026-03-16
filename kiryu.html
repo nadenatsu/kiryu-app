@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>桐生・予想執行アプリ</title>
+    <style>
+        :root { --primary: #003366; --accent: #ffcc00; --bg: #f4f4f4; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
+        .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        h2 { font-size: 16px; margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
+        textarea { width: 100%; height: 120px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; box-sizing: border-box; font-size: 14px; }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .result-area { background: #fff; padding: 15px; border-radius: 12px; border-left: 5px solid var(--accent); min-height: 100px; white-space: pre-wrap; font-size: 14px; line-height: 1.6; }
+        .mode-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+        .mode-a { background: #e3f2fd; color: #1976d2; }
+        .mode-b { background: #ffebee; color: #c62828; }
+        .row { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 4px 0; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>📊 サイト情報の貼り付け</h2>
+        <textarea id="rawInput" placeholder="サイトからコピーした内容をここにペースト..."></textarea>
+        <button onclick="analyzeRace()">執行（分析開始）</button>
+    </div>
+
+    <div id="outputContainer" class="card" style="display:none;">
+        <div id="modeBadge" class="mode-badge"></div>
+        <div id="analysisSummary" class="result-area"></div>
+    </div>
+
+<script>
+function analyzeRace() {
+    const input = document.getElementById('rawInput').value;
+    if (!input) return;
+
+    // --- 1. 環境検知 (憲法4, モード判定) ---
+    const isStable = input.includes("安定板");
+    const isTwoLaps = input.includes("2周");
+    const windMatch = input.match(/風速\s*(\d+)m/);
+    const windSpeed = windMatch ? parseInt(windMatch[1]) : 0;
+    const isModeB = windSpeed >= 7;
+
+    // --- 2. データ抽出 (正規表現) ---
+    const boatData = [];
+    for (let i = 1; i <= 6; i++) {
+        const boatRegex = new RegExp(`${i}号艇[\\s\\S]*?チルト[\\s\\S]*?([\\d.-]+)`, "m");
+        const match = input.match(new RegExp(`${i}号艇[\\s\\S]+?(\\d\\.\\d{2})[\\s\\S]+?(\\d{2}\\.\\d{2})[\\s\\S]+?(\\d\\.\\d{2})[\\s\\S]+?(\\d\\.\\d{2})`, "m"));
+        
+        // 簡易的に勝率やSTも抽出（実際はさらに詳細なパターンマッチが必要）
+        boatData.push({
+            id: i,
+            isA: input.includes(`${i}号艇`) && (input.includes("A1") || input.includes("A2")),
+            isLocal: input.includes(`${i}号艇`) && input.includes("群馬"),
+            straight: match ? parseFloat(match[4]) : 9.99,
+            half: match ? parseFloat(match[2]) : 99.99,
+            turn: match ? parseFloat(match[3]) : 9.99,
+            st: 0.15 // 仮（ここを正規表現で強化）
+        });
+    }
+
+    // --- 3. 憲法ロジック適用 ---
+    let log = `【憲法執行結果】\n`;
+    log += `モード: ${isModeB ? 'B (旋回重視)' : 'A (機力重視)'}\n`;
+    if (isStable) log += `⚠️安定板使用・2周戦発動（第4条・第7条特約）\n`;
+    log += `----------------------------\n`;
+
+    // ステップ1: イン不安チェック
+    const straightRank = [...boatData].sort((a, b) => a.straight - b.straight);
+    const is1Straight1 = straightRank[0].id === 1;
+    
+    let step1 = "Yes (不安なし)";
+    let reason1 = "基本の逃げ優先。";
+    if (boatData[0].isA && is1Straight1) reason1 = "A級かつ直線1位の鉄板条件。";
+    if (!boatData[0].isA && straightRank[5].id === 1) {
+        step1 = "No (不安あり)";
+        reason1 = "B級かつ機力劣勢。";
+    }
+
+    log += `1. イン不安判定: ${step1}\n理由: ${reason1}\n`;
+
+    // ステップ2: 壁チェック
+    let step2 = "強固";
+    if (boatData[1].id === 2 && !boatData[1].isA) {
+        step2 = "不安あり";
+        log += `2. 壁判定: ${step2} (2号艇B級による壁薄リスク)\n`;
+    }
+
+    // 買い目生成 (憲法第8条・黄金比)
+    let focus = "";
+    if (step1 === "Yes (不安なし)") {
+        if (isStable) {
+            focus = `1-${straightRank[1].id}, 1-${straightRank[2].id}`;
+        } else {
+            focus = `1-2-34, 1-3-24`;
+        }
+    } else {
+        focus = `${straightRank[0].id}-1, ${straightRank[0].id}-${straightRank[1].id}`;
+    }
+
+    // --- 4. 出力表示 ---
+    document.getElementById('modeBadge').innerText = isStable ? "安定板・2周戦モード" : (isModeB ? "モードB (風速強)" : "モードA (通常)");
+    document.getElementById('modeBadge').className = `mode-badge ${isModeB ? 'mode-b' : 'mode-a'}`;
+    
+    let finalOutput = `${log}\n自信度: B\n🔥本線\n${focus}\n\n🎯抑え\n1-4-全\n\n※最短航跡特約(第8条)適用`;
+    document.getElementById('analysisSummary').innerText = finalOutput;
+    document.getElementById('outputContainer').style.display = 'block';
+}
+</script>
+</body>
+</html>
