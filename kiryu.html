@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="apple-touch-icon" href="bubuicon.png">
-    <title>桐生・憲法執行アプリ</title>
+    <title>桐生・憲法至上命令</title>
     <style>
         :root { --navy: #001f3f; --gold: #d4af37; --white: #ffffff; --red: #ff4136; --ice: #7fdbff; }
         body { font-family: -apple-system, sans-serif; background: #000; color: var(--white); margin: 0; padding: 10px; }
@@ -14,14 +14,14 @@
         .section { background: #1a1a1a; border-radius: 8px; padding: 10px; margin-bottom: 10px; border: 1px solid #333; }
         h2 { font-size: 11px; color: var(--gold); margin: 0 0 8px 0; border-bottom: 1px solid var(--gold); display: inline-block; padding-bottom: 2px; }
         textarea { width: 100%; height: 40px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; padding: 6px; font-size: 11px; box-sizing: border-box; margin-bottom: 6px; }
-        input, select { background:#222; border:1px solid #444; color:#fff; padding:6px; border-radius:4px; font-size: 11px;}
+        select { width: 100%; background:#222; border:1px solid #444; color:#fff; padding:8px; border-radius:4px; font-size: 13px; margin-bottom: 8px;}
         .flex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-exec { width: 100%; background: linear-gradient(to bottom, #d4af37, #aa841e); color: #000; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-top: 5px; cursor: pointer; }
+        .btn-exec { width: 100%; background: linear-gradient(to bottom, #d4af37, #aa841e); color: #000; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; }
         .result-box { background: var(--navy); border: 2px solid var(--gold); padding: 15px; margin-top: 15px; border-radius: 8px; display: none; }
         .tips-group { margin-bottom: 10px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; }
         .tips-label { font-size: 10px; color: var(--gold); font-weight: bold; }
-        .tips-value { font-size: 20px; color: #fff; text-align: center; font-weight: bold; line-height: 1.6; letter-spacing: 2px; }
-        .analysis-log { font-size: 10px; color: var(--ice); margin-bottom: 5px; text-align: right; }
+        .tips-value { font-size: 22px; color: #fff; text-align: center; font-weight: bold; line-height: 1.6; letter-spacing: 2px; }
+        .analysis-log { font-size: 11px; color: var(--ice); margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -29,132 +29,102 @@
     <div class="header"><h1>🔱 桐生・憲法至上命令 🔱</h1></div>
 
     <div class="section">
+        <h2>環境設定</h2>
         <div class="flex-grid">
-            <select id="month"><option value="winter">12-2月 (赤城おろし)</option><option value="spring">3-5月</option><option value="summer">6-8月</option><option value="autumn" selected>9-11月</option></select>
-            <select id="time"><option value="day">昼</option><option value="sunset">夕方</option><option value="night" selected>夜</option></select>
+            <select id="month"><option value="winter">12-2月 (赤城おろし)</option><option value="other" selected>3-11月</option></select>
+            <select id="time"><option value="day">昼</option><option value="night" selected>夜</option></select>
         </div>
-        <div class="flex-grid" style="margin-top:8px;">
-            <select id="windDir"><option value="oi">追い風</option><option value="mukai">向かい風</option></select>
-            <input type="number" id="wind" value="0" placeholder="風速(m)">
-        </div>
-        <div style="margin-top:10px; display: flex; gap: 20px; justify-content: center; font-size: 11px;">
+        <div style="display:flex; justify-content:center; gap:20px; font-size:12px;">
             <label><input type="checkbox" id="stable"> 安定板</label>
             <label><input type="checkbox" id="lap2"> 2周戦</label>
         </div>
     </div>
 
     <div class="section">
-        <h2>📑 憲法用データ入力</h2>
-        <textarea id="d1" placeholder="1. 出走表 (級別・選手名)"></textarea>
+        <h2>📑 憲法用データ入力 (全7項目)</h2>
+        <textarea id="d1" placeholder="1. 出走表 (級別)"></textarea>
+        <textarea id="d2" placeholder="2. 節間成績 / 枠別10走 (1の不安判断に使用)"></textarea>
         <textarea id="d4" placeholder="4. 逃がし率・決まり手"></textarea>
         <textarea id="d5" placeholder="5. オリジナル展示タイム"></textarea>
         <textarea id="d6" placeholder="6. スタート展示数値"></textarea>
+        
+        <h2>📉 スリット隊形選択</h2>
+        <select id="slitPattern">
+            <option value="">-- 選択してください --</option>
+            <option value="1">1. 全員並走</option><option value="2">2. 中凹み</option><option value="3">3. 中凸</option>
+            <option value="4">4. 内凹み</option><option value="5">5. 内凸</option><option value="6">6. 外凹み</option>
+            <option value="7">7. 外凸</option><option value="8">8. ダッシュ先行</option><option value="9">9. スロー先行</option>
+            <option value="10">10. 奇数先行</option><option value="11">11. 偶数先行</option><option value="12">12. 全体バラバラ</option>
+            <option value="13">13. バラバラ (憲法修正点)</option>
+        </select>
     </div>
 
-    <button class="btn-exec" onclick="executeConstitutionFlow()">憲 法 執 行</button>
+    <button class="btn-exec" onclick="executeConstitution()">憲 法 執 行</button>
 
     <div id="result" class="result-box">
         <div id="log-text" class="analysis-log"></div>
-        <div class="tips-group"><div class="tips-label">🔥 憲法本線 (絞り)</div><div id="main-tips" class="tips-value"></div></div>
-        <div class="tips-group"><div class="tips-label">🎯 憲法抑え (自信順)</div><div id="osae-tips" class="tips-value"></div></div>
+        <div class="tips-group"><div class="tips-label">🔥 憲法本線</div><div id="main-tips" class="tips-value"></div></div>
+        <div class="tips-group"><div class="tips-label">🎯 憲法抑え</div><div id="osae-tips" class="tips-value"></div></div>
     </div>
 </div>
 
 <script>
-function executeConstitutionFlow() {
+function executeConstitution() {
+    const slit = document.getElementById('slitPattern').value;
+    if(!slit) { alert("スリット隊形を選択してください"); return; }
+
     const d1 = document.getElementById('d1').value;
+    const d2 = document.getElementById('d2').value;
     const d4 = document.getElementById('d4').value;
     const d5 = document.getElementById('d5').value;
-    const d6 = document.getElementById('d6').value;
+    const isLap2 = document.getElementById('lap2').checked;
 
-    // --- 補助判定用データ準備 ---
+    // --- 憲法判断: 1に不安材料はない？ ---
+    // 節間成績(d2)に大敗が多い、またはB級なら不安あり
+    const hasBadResult = d2.includes("5") || d2.includes("6") || d2.includes("L") || d2.includes("F");
+    const is1A = d1.includes("A1") || d1.includes("A2");
+    const nigashi = parseFloat((d4.match(/2号艇[\s\S]*?逃がし率\s*(\d+)/) || [0,40])[1]);
+    
+    const is1Safe = is1A && !hasBadResult && nigashi >= 38;
+
+    // --- 機力解析 ---
     const sts = [];
     for(let i=1; i<=6; i++) {
-        const m = d6.match(new RegExp(`${i}\\s*\\.\\s*(\\d+)`)) || [0, "15"];
-        sts.push(parseInt(m[1]));
+        const m = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`)) || [0, "6.85"];
+        sts.push(parseFloat(m[1]));
     }
-    const nigashi = parseFloat((d4.match(/2号艇[\s\S]*?逃がし率\s*(\d+)/) || [0,40])[1]);
-    const straightTimes = [];
-    for(let i=1; i<=6; i++) {
-        const sm = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`)) || [0, "6.85"];
-        straightTimes.push(parseFloat(sm[1]));
-    }
-    const bestStraight = Math.min(...straightTimes);
-    const powerHead = straightTimes.indexOf(bestStraight) + 1;
+    const attacker = sts.indexOf(Math.min(...sts)) + 1;
+    const onkei = (attacker === 1) ? 2 : (attacker === 6 ? 5 : attacker + 1);
 
-    // --- 憲法ロジック実行 (フローチャート完全移植) ---
-    let pattern = "";
-    let reason = "";
-
-    // ステップ1：1に不安材料はない？
-    const is1Safe = (d1.includes("A1") || d1.includes("A2")) && sts[0] <= 20 && nigashi >= 38;
+    let m = "", o = "", pattern = "";
 
     if (is1Safe) {
-        // 【Yes（不安なし）】
-        // 次問：1の逃げパターンは外側に張る？ (4,5コースが強機力か)
-        const s4 = straightTimes[3], s5 = straightTimes[4];
-        const isHiru = s4 < 6.82 || s5 < 6.82;
-
-        if (isHiru) {
-            pattern = "A"; // 1-4, 1-5
-            reason = "1不安なし × 外に張る展開";
+        // 【Yes】逃げパターン
+        if (attacker >= 4) {
+            pattern = "A (1-4, 1-5)";
+            m = "1-4-5 / 1-5-4"; o = "1-4-2 / 1-5-2";
+        } else if (attacker === 3) {
+            pattern = "B (1-3)";
+            m = "1-3-2 / 1-3-4"; o = "1-2-3 / 1-4-3";
         } else {
-            // 次問：1は落としてまわる？ (3が攻め手、または1の出足型)
-            const isOtosu = sts[2] < sts[0] || straightTimes[0] > 6.85;
-            if (isOtosu) {
-                pattern = "B"; // 1-3
-                reason = "1不安なし × 落として回る展開";
-            } else {
-                pattern = "C"; // 1-2
-                reason = "1不安なし × 最短逃げ展開";
-            }
+            pattern = "C (1-2)";
+            m = "1-2-3 / 1-2-4"; o = "1-3-2 / 1-2-5";
         }
     } else {
-        // 【No（不安あり）】
-        // 次問：攻め手はいる？ (1以外に直線タイム1位がいるか)
-        const attacker = powerHead !== 1 ? powerHead : (straightTimes[2] < 6.83 ? 3 : 4);
-        const hasAttacker = true; // 基本的に誰かしら攻める
-
-        // 次問：カベとなるレーサーはいる？ (2の逃がし率やST)
-        const hasWall = nigashi >= 40 && sts[1] <= sts[attacker-1];
-
-        if (hasWall) {
-            // カベがあれば1は逃げられる？
-            if (sts[0] < 18) {
-                pattern = "D"; // 1→カベ, 1→攻め手
-                reason = "1不安あり × カベあり × 逃げ粘り";
-            } else {
-                pattern = "E"; // カベ→攻め手, 攻め手→カベ
-                reason = "1不安あり × カベあり × イン沈み";
-            }
+        // 【No】攻めパターン
+        const head = (attacker === 1) ? 2 : attacker;
+        const soto = (head < 6) ? head + 1 : 1;
+        
+        if (nigashi >= 40) {
+            pattern = "D/E (カベあり)";
+            m = `1-2-${head} / 1-${head}-2`; o = `${head}-2-1 / 2-${head}-1`;
         } else {
-            // カベがなくても1は2着に残せる？
-            if (sts[0] < 20) {
-                pattern = "F"; // カベ→1, 攻め手→1, 攻め手の外→1
-                reason = "1不安あり × カベなし × イン残し";
-            } else {
-                pattern = "G"; // 攻め手→攻め手の外, 攻め手の外→攻め手
-                reason = "1不安あり × カベなし × イン完全沈み";
-            }
+            pattern = "F/G (カベなし)";
+            m = `${head}-${soto}-1 / ${head}-${soto}-全`; o = `${soto}-${head}-1`;
         }
     }
 
-    // --- 出力生成 ---
-    const atk = powerHead !== 1 ? powerHead : 3;
-    const soto = (atk < 6) ? atk + 1 : 1;
-    let m = "", o = "";
-
-    switch(pattern) {
-        case "A": m = "1-4-5 / 1-5-4"; o = "1-4-2 / 1-5-2"; break;
-        case "B": m = "1-3-2 / 1-3-4"; o = "1-2-3 / 1-4-3"; break;
-        case "C": m = "1-2-3 / 1-2-4"; o = "1-3-2 / 1-2-5"; break;
-        case "D": m = `1-2-${atk} / 1-${atk}-2`; o = `1-2-3 / 1-3-2`; break;
-        case "E": m = `2-${atk}-1 / ${atk}-2-1`; o = `2-${atk}-全 / ${atk}-2-全`; break;
-        case "F": m = `2-1-${atk} / ${atk}-1-2`; o = `${soto}-1-${atk}`; break;
-        case "G": m = `${atk}-${soto}-全`; o = `${soto}-${atk}-全`; break;
-    }
-
-    document.getElementById('log-text').innerText = `執行憲法パターン: ${pattern} (${reason})`;
+    document.getElementById('log-text').innerHTML = `判定: ${is1Safe ? '1不安なし' : '1に不安あり'}<br>分析: ${pattern}`;
     document.getElementById('main-tips').innerText = m;
     document.getElementById('osae-tips').innerText = o;
     document.getElementById('result').style.display = 'block';
