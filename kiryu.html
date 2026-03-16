@@ -71,7 +71,7 @@
 
     <div id="result" class="result-box">
         <div id="log-text" class="analysis-log"></div>
-        <div class="tips-group"><div class="tips-label">🔥 本線 (3連単・絞り)</div><div id="main-tips" class="tips-value"></div></div>
+        <div class="tips-group"><div class="tips-label">🔥 本線 (3連単・的中優先)</div><div id="main-tips" class="tips-value"></div></div>
         <div class="tips-group"><div class="tips-label">🎯 抑え (自信順)</div><div id="osae-tips" class="tips-value"></div></div>
     </div>
 </div>
@@ -99,50 +99,64 @@ function executeFinalConstitution() {
     }
     const is1Late = sts[0] > 22 || (sts[0] > sts[1] + 7);
 
-    // 2. 機力評価
+    // 2. モーター・ボートランキング解析
     const rateMap = {};
     rankingText.split('\n').forEach(line => {
         const match = line.match(/\|\s*\*\*(\d+)\*\*\s*\|\s*([\d.]+)/);
         if(match) rateMap[match[1]] = parseFloat(match[2]);
     });
 
+    // 3. 憲法に基づいた艇別パワー計算
     const boats = [];
     for(let i=1; i<=6; i++){
         const mNumMatch = d1.match(new RegExp(`${i}号艇[\\s\\S]*?モーター\\s*(\\d+)`));
         const straightMatch = d5.match(new RegExp(`${i}号艇[\\s\\S]*?直線\\s*([\\d.]+)`));
         const halfMatch = d5.match(new RegExp(`${i}号艇[\\s\\S]*?半周\\s*([\\d.]+)`));
         
-        let p = rateMap[mNumMatch ? mNumMatch[1] : null] || 30.0;
-        const straight = straightMatch ? parseFloat(straightMatch[1]) : 6.80;
-        const half = halfMatch ? parseFloat(halfMatch[1]) : 18.50;
+        let powerScore = rateMap[mNumMatch ? mNumMatch[1] : null] || 30.0;
+        const straightTime = straightMatch ? parseFloat(straightMatch[1]) : 6.80;
+        const halfTime = halfMatch ? parseFloat(halfMatch[1]) : 18.50;
 
-        if(isLap2) p += (18.5 - half) * 12; // 2周戦は出足優先度強化
-        if(time === "night") p += 1.5; // 夜は出力UP
-        if(month === "winter" && windDir === "mukai") p -= 1; // 冬の赤城おろしは波乱要因
+        // オリジナル展示のスコア化 (低い方が良い)
+        powerScore += (6.90 - straightTime) * 100;
+        if(isLap2) powerScore += (18.80 - halfTime) * 50;
+
+        // 環境補正
+        if(time === "night") powerScore += 2;
+        if(month === "winter" && windDir === "mukai") powerScore -= 2; // 波乱要因
         
-        boats.push({id: i, power: p, straight: straight});
+        boats.push({id: i, score: powerScore, st: sts[i-1]});
     }
 
-    const sRank = [...boats].sort((a,b) => a.straight - b.straight);
+    // スコア順に並び替え (1号艇以外)
+    const rivals = [...boats].filter(b => b.id !== 1).sort((a,b) => b.score - a.score);
+    
     const nigashi = parseFloat((d4.match(/2号艇[\s\S]*?逃がし率\s*(\d+)/) || [0,45])[1]);
-    const isIndefense = (d1.includes("A1") || d1.includes("A2")) && (nigashi >= 38) && !is1Late;
+    const is1A = d1.includes("A1") || d1.includes("A2");
+    const isIndefense = is1A && (nigashi >= 38) && !is1Late;
 
-    const getKumi = (r1, r2, r3) => {
-        const f = r1, s = [r2, r3, 1,2,3,4,5,6].find(n => n !== f), t = [r3, r2, 1,2,3,4,5,6].find(n => n !== f && n !== s);
-        return `${f}-${s}-${t}`;
-    };
+    // 買い目生成ロジック (憲法反映版)
+    const generate = (first, second, third) => `${first}-${second}-${third}`;
 
     let main = [], osae = [];
     if (isIndefense) {
-        const h1 = sRank[0].id === 1 ? sRank[1].id : sRank[0].id;
-        main = [getKumi(1, h1, 2), getKumi(1, h1, 3)];
-        osae = [getKumi(1, 2, 3), getKumi(1, 3, 2)];
-        document.getElementById('log-text').innerText = "判定: 逃げ軸固定";
+        // 逃げ本線：2着候補は機力上位と2,3号艇
+        const himo1 = rivals[0].id; // 機力1位
+        const himo2 = (himo1 === 2) ? rivals[1].id : 2;
+        const himo3 = (himo1 === 3 || himo2 === 3) ? rivals[2].id : 3;
+
+        main = [generate(1, himo1, himo2), generate(1, himo1, himo3)];
+        osae = [generate(1, 2, 3), generate(1, 3, 2)];
+        document.getElementById('log-text').innerText = "判定: 憲法に基づきイン逃げ";
     } else {
-        const atk = is1Late ? (sts[1] < sts[2] ? 2 : 3) : sRank[0].id;
-        main = [getKumi(atk, 1, sRank[1].id), getKumi(atk, sRank[1].id, 1)];
-        osae = [getKumi(1, atk, sRank[1].id), getKumi(atk, sRank[2].id, 1)];
-        document.getElementById('log-text').innerText = "判定: 隊形/機力からの攻め";
+        // 波乱/攻め：機力1位を軸にする
+        const atk = rivals[0].id;
+        const himo1 = 1;
+        const himo2 = rivals[1].id;
+        
+        main = [generate(atk, 1, himo2), generate(atk, himo2, 1)];
+        osae = [generate(1, atk, himo2), generate(atk, rivals[1].id, rivals[2].id)];
+        document.getElementById('log-text').innerText = "判定: 機力・スリット優勢艇の攻め";
     }
 
     document.getElementById('main-tips').innerText = main.join(' / ');
